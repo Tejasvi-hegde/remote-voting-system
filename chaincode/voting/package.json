@@ -1,0 +1,16 @@
+{
+  "name": "voting-chaincode",
+  "version": "1.0.0",
+  "description": "Voting Smart Contract for Hyperledger Fabric",
+  "main": "index.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "fabric-contract-api": "^2.2.20",
+    "fabric-shim": "^2.2.20"
+  }
+}

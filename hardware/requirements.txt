@@ -1,0 +1,5 @@
+pyfingerprint==2.2.1
+requests==2.31.0
+hashlib        # built-in, listed for reference
+RPi.GPIO==0.7.1
+Pillow==10.1.0
