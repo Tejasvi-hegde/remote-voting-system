@@ -140,8 +140,12 @@ python3 hardware/enroll.py
 export BACKEND_URL=http://YOUR_SERVER_IP:5000
 export FRONTEND_URL=http://YOUR_SERVER_IP:3000
 export TERMINAL_ID=RVC-1
+export UART_PORT=/dev/ttyS0
+export UART_BAUD_RATE=57600
 python3 hardware/biometric.py
 ```
+
+The Raspberry Pi terminal now starts a small local callback service so the kiosk browser can notify the terminal automatically when a vote is completed. That removes the old manual reset dependency after each vote.
 
 ---
 
@@ -196,6 +200,15 @@ Transaction ID returned to voter
 - Local SQLite offline vote buffer and sync
 - Terminal kiosk mode (Chromium fullscreen)
 - Voter ID barcode scanner integration
+
+## Low-Cost Hardware Option
+- Raspberry Pi 4
+- R307 or AS608 fingerprint sensor
+- Reused HDMI monitor or TV
+- USB keyboard
+- Optional USB barcode scanner
+
+See [hardware/LOW_COST_SETUP.md](/D:/voting_project/remote-voting-system/hardware/LOW_COST_SETUP.md) for a low-cost wiring and setup guide.
 
 ## CS Student Contributions
 - Hyperledger Fabric network configuration and chaincode

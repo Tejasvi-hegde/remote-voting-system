@@ -1,0 +1,19 @@
+# 1. Install dependencies
+cd backend && npm install && cd ..
+cd frontend && npm install && cd ..
+cd chaincode/voting && npm install && cd ../..
+
+# 2. Set up environment variables
+cp backend/.env.example backend/.env
+# Edit backend/.env - set JWT_SECRET and VOTE_ENCRYPTION_KEY
+
+# 3. Start all services with Docker
+docker-compose -f docker/docker-compose.yml up -d
+
+# 4. Seed test data (in another terminal)
+cd backend
+node seed.js
+
+# Frontend runs on: http://localhost:3000
+# Backend API runs on: http://localhost:5000
+# MongoDB admin: http://localhost:27017

@@ -44,8 +44,7 @@ router.get('/ballot', protect, async (req, res) => {
  */
 router.get('/status/:voterID', protect, async (req, res) => {
   try {
-    const { Voter } = require('../models/Voter');
-    const voter = await Voter.findOne(
+    const voter = await require('../models/Voter').findOne(
       { voterID: req.params.voterID.toUpperCase() },
       { _id: 0, voterID: 1, name: 1, constituency: 1, hasVoted: 1, votedAt: 1 }
     );

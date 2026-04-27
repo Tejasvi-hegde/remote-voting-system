@@ -21,9 +21,20 @@ function App() {
     // Extract token from URL (set by Pi terminal)
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
+    const terminalID = params.get('terminal');
+    const terminalCallback = params.get('terminalCallback');
+
     if (token) {
       sessionStorage.setItem('voting_token', token);
-      // Clean token from URL without reload (security)
+    }
+    if (terminalID) {
+      sessionStorage.setItem('terminal_id', terminalID);
+    }
+    if (terminalCallback) {
+      sessionStorage.setItem('terminal_callback', terminalCallback);
+    }
+    if (token || terminalID || terminalCallback) {
+      // Clean terminal session details from the URL without reload.
       window.history.replaceState({}, document.title, window.location.pathname);
     }
     setReady(true);

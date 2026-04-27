@@ -32,7 +32,7 @@ services:
   # ── Node.js Backend ───────────────────────────────────────────────────────
   backend:
     build:
-      context: ./backend
+      context: ../backend
       dockerfile: Dockerfile
     container_name: voting-backend
     restart: unless-stopped
@@ -55,10 +55,12 @@ services:
       FABRIC_ADMIN_SECRET: adminpw
       FRONTEND_URL: http://localhost:3000
     volumes:
-      - ./backend/fabric:/app/fabric
+      - ../backend/fabric:/app/fabric
     depends_on:
       - mongodb
-      - peer0.org1
+      - peer0.org1.example.com
+      - couchdb
+      - orderer.example.com
     networks:
       - voting-net
       - fabric-net
@@ -66,7 +68,7 @@ services:
   # ── React Frontend ────────────────────────────────────────────────────────
   frontend:
     build:
-      context: ./frontend
+      context: ../frontend
       dockerfile: Dockerfile
     container_name: voting-frontend
     restart: unless-stopped
@@ -99,8 +101,8 @@ services:
       - "7050:7050"
       - "7053:7053"
     volumes:
-      - ./network/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp:/var/hyperledger/orderer/msp
-      - ./network/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls:/var/hyperledger/orderer/tls
+      - ../network/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp:/var/hyperledger/orderer/msp
+      - ../network/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/tls:/var/hyperledger/orderer/tls
       - orderer_data:/var/hyperledger/production/orderer
     networks:
       - fabric-net
@@ -137,8 +139,8 @@ services:
       - "7051:7051"
     volumes:
       - /var/run/:/host/var/run/
-      - ./network/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/msp:/etc/hyperledger/fabric/msp
-      - ./network/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls:/etc/hyperledger/fabric/tls
+      - ../network/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/msp:/etc/hyperledger/fabric/msp
+      - ../network/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls:/etc/hyperledger/fabric/tls
       - peer0_org1_data:/var/hyperledger/production
     depends_on:
       - couchdb
@@ -175,8 +177,8 @@ services:
       - "9051:9051"
     volumes:
       - /var/run/:/host/var/run/
-      - ./network/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/msp:/etc/hyperledger/fabric/msp
-      - ./network/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls:/etc/hyperledger/fabric/tls
+      - ../network/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/msp:/etc/hyperledger/fabric/msp
+      - ../network/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls:/etc/hyperledger/fabric/tls
       - peer0_org2_data:/var/hyperledger/production
     depends_on:
       - couchdb

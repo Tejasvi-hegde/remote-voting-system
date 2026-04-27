@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { castVote } from '../api';
 
 /**
  * ConfirmScreen
  * Shows the voter their selection one final time.
- * On confirm → submits to blockchain via /api/vote/cast
- * On back   → returns to ballot
+ * On confirm -> submits to blockchain via /api/vote/cast
+ * On back    -> returns to ballot
  *
  * After successful submission, shows the transaction ID
  * which the voter can use to verify their vote later.
@@ -29,10 +29,19 @@ function ConfirmScreen() {
     setSubmitting(true);
     setError('');
     try {
+      const terminalCallback = sessionStorage.getItem('terminal_callback');
+      const terminalID = sessionStorage.getItem('terminal_id');
       const { data } = await castVote(candidate.candidateID);
-      // Clear session — vote is done
-      sessionStorage.clear();
-      setResult(data);
+
+      sessionStorage.removeItem('voting_token');
+      sessionStorage.removeItem('selected_candidate');
+
+      setResult({
+        ...data,
+        terminalCallback,
+        terminalID,
+        candidateID: candidate.candidateID
+      });
     } catch (err) {
       const msg = err.response?.data?.error || 'Vote submission failed. Please call the presiding officer.';
       setError(msg);
@@ -40,7 +49,12 @@ function ConfirmScreen() {
     }
   };
 
-  // ── Success state ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (result) {
+      notifyTerminal(result);
+    }
+  }, [result]);
+
   if (result) {
     return (
       <div className="screen success-screen">
@@ -57,16 +71,21 @@ function ConfirmScreen() {
         </div>
 
         <p className="thank-you">
-          🙏 Thank you for exercising your democratic right. <br />
+          Thank you for exercising your democratic right. <br />
           This terminal will reset in a moment.
         </p>
 
-        <AutoResetTimer seconds={20} onDone={() => window.location.href = '/'} />
+        <AutoResetTimer
+          seconds={20}
+          onDone={() => {
+            sessionStorage.clear();
+            window.location.href = '/';
+          }}
+        />
       </div>
     );
   }
 
-  // ── Submitting state ───────────────────────────────────────────────────────
   if (submitting) {
     return (
       <div className="screen loading-screen">
@@ -78,10 +97,9 @@ function ConfirmScreen() {
     );
   }
 
-  // ── Confirm state ──────────────────────────────────────────────────────────
   return (
     <div className="screen confirm-screen">
-      <h2>⚠️ Final Confirmation</h2>
+      <h2>Final Confirmation</h2>
       <p className="confirm-instruction">
         You are about to cast your vote for:
       </p>
@@ -96,7 +114,7 @@ function ConfirmScreen() {
 
       <div className="confirm-warning">
         <p>
-          ⚠️ <strong>This action cannot be undone.</strong><br />
+          <strong>This action cannot be undone.</strong><br />
           Once submitted, your vote is permanently recorded on the blockchain.
         </p>
       </div>
@@ -112,31 +130,57 @@ function ConfirmScreen() {
           className="btn-secondary"
           onClick={() => navigate('/ballot')}
         >
-          ← Go Back
+          Go Back
         </button>
         <button
           className="btn-primary btn-confirm"
           onClick={handleConfirm}
         >
-          ✅ Cast My Vote
+          Cast My Vote
         </button>
       </div>
     </div>
   );
 }
 
-// Auto-resets the terminal after vote is cast
+function notifyTerminal(result) {
+  if (!result?.terminalCallback || result._terminalNotified) {
+    return;
+  }
+
+  const callbackURL = new URL(result.terminalCallback);
+  callbackURL.searchParams.set('status', 'completed');
+  callbackURL.searchParams.set('transactionID', result.transactionID);
+  callbackURL.searchParams.set('timestamp', result.timestamp);
+  callbackURL.searchParams.set('candidateID', result.candidateID);
+  if (result.terminalID) {
+    callbackURL.searchParams.set('terminalID', result.terminalID);
+  }
+
+  // Best-effort notification to the local Raspberry Pi callback server.
+  const beacon = new Image();
+  beacon.src = callbackURL.toString();
+  result._terminalNotified = true;
+}
+
 function AutoResetTimer({ seconds, onDone }) {
   const [count, setCount] = React.useState(seconds);
+
   React.useEffect(() => {
-    const t = setInterval(() => {
-      setCount((c) => {
-        if (c <= 1) { clearInterval(t); onDone(); return 0; }
-        return c - 1;
+    const timer = setInterval(() => {
+      setCount((current) => {
+        if (current <= 1) {
+          clearInterval(timer);
+          onDone();
+          return 0;
+        }
+        return current - 1;
       });
     }, 1000);
-    return () => clearInterval(t);
+
+    return () => clearInterval(timer);
   }, [onDone]);
+
   return (
     <p className="reset-notice">
       Terminal resets in <strong>{count}</strong> seconds...
