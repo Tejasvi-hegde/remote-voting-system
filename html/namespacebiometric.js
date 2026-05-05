@@ -1,0 +1,26 @@
+var namespacebiometric =
+[
+    [ "TerminalCallbackHandler", "classbiometric_1_1_terminal_callback_handler.html", "classbiometric_1_1_terminal_callback_handler" ],
+    [ "build_terminal_callback_url", "namespacebiometric.html#a05c34422a0ea14233a54f3a85035b22c", null ],
+    [ "capture_and_hash", "namespacebiometric.html#a41501981c198f22f96cacd914116fd8f", null ],
+    [ "clear_screen", "namespacebiometric.html#ae8ae83903c42f5073c94b4deedc373c2", null ],
+    [ "connect_sensor", "namespacebiometric.html#a90bcc6da07a9e2af894b9ad0ae56b97a", null ],
+    [ "init_local_db", "namespacebiometric.html#a2e8c2f65f33e52866dba42be6334f754", null ],
+    [ "main", "namespacebiometric.html#a0d2829ae0c24e2f8f8bcc86139df0a3a", null ],
+    [ "open_ballot", "namespacebiometric.html#a0cb11f78b2f5a86cb22165afcf0528bf", null ],
+    [ "print_banner", "namespacebiometric.html#afee8cbf0f80758160cbffbfff41f47ee", null ],
+    [ "start_callback_server", "namespacebiometric.html#a0719a0492f63a914ecd24914905fd41d", null ],
+    [ "sync_offline_queue", "namespacebiometric.html#a0baa9cceaef71010fccbcd4fb8967e03", null ],
+    [ "verify_voter", "namespacebiometric.html#a3e429bf9633b10c965c81220ac724369", null ],
+    [ "BACKEND_URL", "namespacebiometric.html#a1543b08ec7094f713b5d468428fbc192", null ],
+    [ "BAUD_RATE", "namespacebiometric.html#a71ebbbf455fe5f4270ace69fc92f2074", null ],
+    [ "CALLBACK_HOST", "namespacebiometric.html#a6b04c8f83f50f4f33c91f807cee2aa68", null ],
+    [ "CALLBACK_PORT", "namespacebiometric.html#aabfb75fea07bb7367abc8f9ff7c89274", null ],
+    [ "FRONTEND_URL", "namespacebiometric.html#aa97be30fe5be70b3ef0c86f02e35cdd9", null ],
+    [ "LAST_COMPLETION", "namespacebiometric.html#a06df332fb0c5023e28396b73d3772498", null ],
+    [ "LOCAL_DB_PATH", "namespacebiometric.html#ab4833cc6b9821cd07d45efb9ab90a184", null ],
+    [ "SESSION_COMPLETE", "namespacebiometric.html#a5885b47a59c45db4a4144eb02bb74796", null ],
+    [ "SESSION_TIMEOUT_SECONDS", "namespacebiometric.html#ad7abe79d53921c2022f92a7815ce823a", null ],
+    [ "TERMINAL_ID", "namespacebiometric.html#a6d215dab0a37685a1a7a0f6b734e4f0a", null ],
+    [ "UART_PORT", "namespacebiometric.html#a7bf54015e5c2a0ca0dbc3df135d5d7cb", null ]
+];

@@ -1,0 +1,35 @@
+\doxysection{backend/\+models/\+\+Voter.js File Reference}
+\hypertarget{models_2_voter_8js}{}\label{models_2_voter_8js}\index{backend/models/Voter.js@{backend/models/Voter.js}}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{models_2_voter_8js_afb9c0464d485a1268d1a49e2e4c8590e}{mongoose}} = require(\textquotesingle{}mongoose\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{models_2_voter_8js_abf982cbb54678fe657a739109582cb9a}{voter\+Schema}}
+\item 
+module \doxymbox{\hyperlink{models_2_voter_8js_aa4072ba4b6b56b0fb6f4801f17ab2b34}{exports}} = mongoose.\+model(\textquotesingle{}\doxymbox{\hyperlink{routes_2auth_8js_a43e115d280dcb01f4b5133492fe7e201}{Voter}}\textquotesingle{}, \doxymbox{\hyperlink{models_2_voter_8js_abf982cbb54678fe657a739109582cb9a}{voter\+Schema}})
+\end{DoxyCompactItemize}
+
+
+\label{doc-var-members}
+\Hypertarget{models_2_voter_8js_doc-var-members}
+\doxysubsection{Variable Documentation}
+\Hypertarget{models_2_voter_8js_aa4072ba4b6b56b0fb6f4801f17ab2b34}\index{Voter.js@{Voter.js}!exports@{exports}}
+\index{exports@{exports}!Voter.js@{Voter.js}}
+\doxysubsubsection{\texorpdfstring{exports}{exports}}
+{\footnotesize\ttfamily \label{models_2_voter_8js_aa4072ba4b6b56b0fb6f4801f17ab2b34} 
+module exports = mongoose.\+model(\textquotesingle{}\doxymbox{\hyperlink{routes_2auth_8js_a43e115d280dcb01f4b5133492fe7e201}{Voter}}\textquotesingle{}, \doxymbox{\hyperlink{models_2_voter_8js_abf982cbb54678fe657a739109582cb9a}{voter\+Schema}})}
+
+\Hypertarget{models_2_voter_8js_afb9c0464d485a1268d1a49e2e4c8590e}\index{Voter.js@{Voter.js}!mongoose@{mongoose}}
+\index{mongoose@{mongoose}!Voter.js@{Voter.js}}
+\doxysubsubsection{\texorpdfstring{mongoose}{mongoose}}
+{\footnotesize\ttfamily \label{models_2_voter_8js_afb9c0464d485a1268d1a49e2e4c8590e} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} mongoose = require(\textquotesingle{}mongoose\textquotesingle{})}
+
+\Hypertarget{models_2_voter_8js_abf982cbb54678fe657a739109582cb9a}\index{Voter.js@{Voter.js}!voterSchema@{voterSchema}}
+\index{voterSchema@{voterSchema}!Voter.js@{Voter.js}}
+\doxysubsubsection{\texorpdfstring{voterSchema}{voterSchema}}
+{\footnotesize\ttfamily \label{models_2_voter_8js_abf982cbb54678fe657a739109582cb9a} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} voter\+Schema}
+
+Voter Schema Stores pre-\/registered voter information. biometric\+Hash is SHA-\/256 of the fingerprint template — the raw biometric NEVER leaves the hardware device. 

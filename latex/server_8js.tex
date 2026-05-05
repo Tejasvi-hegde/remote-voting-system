@@ -1,0 +1,98 @@
+\doxysection{backend/\+server.js File Reference}
+\hypertarget{server_8js}{}\label{server_8js}\index{backend/server.js@{backend/server.js}}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{server_8js_a81e570c198204c57e1ebcace4f4e6dad}{express}} = require(\textquotesingle{}express\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{server_8js_afb9c0464d485a1268d1a49e2e4c8590e}{mongoose}} = require(\textquotesingle{}mongoose\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{server_8js_a2481c912250fa1495a111ba4e7a66d07}{cors}} = require(\textquotesingle{}cors\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{server_8js_aac4fec31e77f80f2137ed48354bcca13}{helmet}} = require(\textquotesingle{}helmet\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{server_8js_af7f3142f4c6fd9582b65f72e50ca8bd5}{morgan}} = require(\textquotesingle{}morgan\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{server_8js_ac8df4181b6f202238a2a83e3ebdede35}{rate\+Limit}} = require(\textquotesingle{}\doxymbox{\hyperlink{server_8js_a81e570c198204c57e1ebcace4f4e6dad}{express}}-\/rate-\/limit\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{server_8js_aeb85dfb8030809d459d88956cff6c5e2}{auth\+Routes}} = require(\textquotesingle{}./\+routes/\+auth\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{server_8js_ac4c766e4ef21ac01a0ead15db9d246e7}{voter\+Routes}} = require(\textquotesingle{}./\+routes/\+voter\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{server_8js_a4977526568be5f6e64026e805906349f}{vote\+Routes}} = require(\textquotesingle{}./\+routes/\+vote\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{server_8js_ae2a6f36b06caa478bf60c6cada7aab04}{dashboard\+Routes}} = require(\textquotesingle{}./\+routes/\+dashboard\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{server_8js_a61cd714f583f5ea8c02710a85ef32b9c}{app}} = \doxymbox{\hyperlink{server_8js_a81e570c198204c57e1ebcace4f4e6dad}{express}}()
+\end{DoxyCompactItemize}
+
+
+\label{doc-var-members}
+\Hypertarget{server_8js_doc-var-members}
+\doxysubsection{Variable Documentation}
+\Hypertarget{server_8js_a61cd714f583f5ea8c02710a85ef32b9c}\index{server.js@{server.js}!app@{app}}
+\index{app@{app}!server.js@{server.js}}
+\doxysubsubsection{\texorpdfstring{app}{app}}
+{\footnotesize\ttfamily \label{server_8js_a61cd714f583f5ea8c02710a85ef32b9c} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} app = \doxymbox{\hyperlink{server_8js_a81e570c198204c57e1ebcace4f4e6dad}{express}}()}
+
+\Hypertarget{server_8js_aeb85dfb8030809d459d88956cff6c5e2}\index{server.js@{server.js}!authRoutes@{authRoutes}}
+\index{authRoutes@{authRoutes}!server.js@{server.js}}
+\doxysubsubsection{\texorpdfstring{authRoutes}{authRoutes}}
+{\footnotesize\ttfamily \label{server_8js_aeb85dfb8030809d459d88956cff6c5e2} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} auth\+Routes = require(\textquotesingle{}./\+routes/\+auth\textquotesingle{})}
+
+\Hypertarget{server_8js_a2481c912250fa1495a111ba4e7a66d07}\index{server.js@{server.js}!cors@{cors}}
+\index{cors@{cors}!server.js@{server.js}}
+\doxysubsubsection{\texorpdfstring{cors}{cors}}
+{\footnotesize\ttfamily \label{server_8js_a2481c912250fa1495a111ba4e7a66d07} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} cors = require(\textquotesingle{}cors\textquotesingle{})}
+
+\Hypertarget{server_8js_ae2a6f36b06caa478bf60c6cada7aab04}\index{server.js@{server.js}!dashboardRoutes@{dashboardRoutes}}
+\index{dashboardRoutes@{dashboardRoutes}!server.js@{server.js}}
+\doxysubsubsection{\texorpdfstring{dashboardRoutes}{dashboardRoutes}}
+{\footnotesize\ttfamily \label{server_8js_ae2a6f36b06caa478bf60c6cada7aab04} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} dashboard\+Routes = require(\textquotesingle{}./\+routes/\+dashboard\textquotesingle{})}
+
+\Hypertarget{server_8js_a81e570c198204c57e1ebcace4f4e6dad}\index{server.js@{server.js}!express@{express}}
+\index{express@{express}!server.js@{server.js}}
+\doxysubsubsection{\texorpdfstring{express}{express}}
+{\footnotesize\ttfamily \label{server_8js_a81e570c198204c57e1ebcace4f4e6dad} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} express = require(\textquotesingle{}express\textquotesingle{})}
+
+\Hypertarget{server_8js_aac4fec31e77f80f2137ed48354bcca13}\index{server.js@{server.js}!helmet@{helmet}}
+\index{helmet@{helmet}!server.js@{server.js}}
+\doxysubsubsection{\texorpdfstring{helmet}{helmet}}
+{\footnotesize\ttfamily \label{server_8js_aac4fec31e77f80f2137ed48354bcca13} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} helmet = require(\textquotesingle{}helmet\textquotesingle{})}
+
+\Hypertarget{server_8js_afb9c0464d485a1268d1a49e2e4c8590e}\index{server.js@{server.js}!mongoose@{mongoose}}
+\index{mongoose@{mongoose}!server.js@{server.js}}
+\doxysubsubsection{\texorpdfstring{mongoose}{mongoose}}
+{\footnotesize\ttfamily \label{server_8js_afb9c0464d485a1268d1a49e2e4c8590e} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} mongoose = require(\textquotesingle{}mongoose\textquotesingle{})}
+
+\Hypertarget{server_8js_af7f3142f4c6fd9582b65f72e50ca8bd5}\index{server.js@{server.js}!morgan@{morgan}}
+\index{morgan@{morgan}!server.js@{server.js}}
+\doxysubsubsection{\texorpdfstring{morgan}{morgan}}
+{\footnotesize\ttfamily \label{server_8js_af7f3142f4c6fd9582b65f72e50ca8bd5} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} morgan = require(\textquotesingle{}morgan\textquotesingle{})}
+
+\Hypertarget{server_8js_ac8df4181b6f202238a2a83e3ebdede35}\index{server.js@{server.js}!rateLimit@{rateLimit}}
+\index{rateLimit@{rateLimit}!server.js@{server.js}}
+\doxysubsubsection{\texorpdfstring{rateLimit}{rateLimit}}
+{\footnotesize\ttfamily \label{server_8js_ac8df4181b6f202238a2a83e3ebdede35} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} rate\+Limit = require(\textquotesingle{}\doxymbox{\hyperlink{server_8js_a81e570c198204c57e1ebcace4f4e6dad}{express}}-\/rate-\/limit\textquotesingle{})}
+
+\Hypertarget{server_8js_a4977526568be5f6e64026e805906349f}\index{server.js@{server.js}!voteRoutes@{voteRoutes}}
+\index{voteRoutes@{voteRoutes}!server.js@{server.js}}
+\doxysubsubsection{\texorpdfstring{voteRoutes}{voteRoutes}}
+{\footnotesize\ttfamily \label{server_8js_a4977526568be5f6e64026e805906349f} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} vote\+Routes = require(\textquotesingle{}./\+routes/\+vote\textquotesingle{})}
+
+\Hypertarget{server_8js_ac4c766e4ef21ac01a0ead15db9d246e7}\index{server.js@{server.js}!voterRoutes@{voterRoutes}}
+\index{voterRoutes@{voterRoutes}!server.js@{server.js}}
+\doxysubsubsection{\texorpdfstring{voterRoutes}{voterRoutes}}
+{\footnotesize\ttfamily \label{server_8js_ac4c766e4ef21ac01a0ead15db9d246e7} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} voter\+Routes = require(\textquotesingle{}./\+routes/\+voter\textquotesingle{})}
+

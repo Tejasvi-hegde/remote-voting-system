@@ -1,0 +1,62 @@
+\doxysection{hardware/\+biometric.py File Reference}
+\hypertarget{biometric_8py}{}\label{biometric_8py}\index{hardware/biometric.py@{hardware/biometric.py}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \doxymbox{\hyperlink{classbiometric_1_1_terminal_callback_handler}{biometric.\+Terminal\+Callback\+Handler}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \doxymbox{\hyperlink{namespacebiometric}{biometric}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{namespacebiometric_a2e8c2f65f33e52866dba42be6334f754}{biometric.\+init\+\_\+local\+\_\+db}} ()
+\item 
+\doxymbox{\hyperlink{namespacebiometric_a0baa9cceaef71010fccbcd4fb8967e03}{biometric.\+sync\+\_\+offline\+\_\+queue}} ()
+\item 
+\doxymbox{\hyperlink{namespacebiometric_a05c34422a0ea14233a54f3a85035b22c}{biometric.\+build\+\_\+terminal\+\_\+callback\+\_\+url}} ()
+\item 
+\doxymbox{\hyperlink{namespacebiometric_a0719a0492f63a914ecd24914905fd41d}{biometric.\+start\+\_\+callback\+\_\+server}} ()
+\item 
+\doxymbox{\hyperlink{namespacebiometric_a90bcc6da07a9e2af894b9ad0ae56b97a}{biometric.\+connect\+\_\+sensor}} ()
+\item 
+\doxymbox{\hyperlink{namespacebiometric_a41501981c198f22f96cacd914116fd8f}{biometric.\+capture\+\_\+and\+\_\+hash}} (sensor)
+\item 
+\doxymbox{\hyperlink{namespacebiometric_a3e429bf9633b10c965c81220ac724369}{biometric.\+verify\+\_\+voter}} (voter\+\_\+id, biometric\+\_\+hash)
+\item 
+\doxymbox{\hyperlink{namespacebiometric_a0cb11f78b2f5a86cb22165afcf0528bf}{biometric.\+open\+\_\+ballot}} (token)
+\item 
+\doxymbox{\hyperlink{namespacebiometric_ae8ae83903c42f5073c94b4deedc373c2}{biometric.\+clear\+\_\+screen}} ()
+\item 
+\doxymbox{\hyperlink{namespacebiometric_afee8cbf0f80758160cbffbfff41f47ee}{biometric.\+print\+\_\+banner}} ()
+\item 
+\doxymbox{\hyperlink{namespacebiometric_a0d2829ae0c24e2f8f8bcc86139df0a3a}{biometric.\+main}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{namespacebiometric_a7bf54015e5c2a0ca0dbc3df135d5d7cb}{biometric.\+UART\+\_\+\+PORT}} = os.\+environ.\+get(\textquotesingle{}UART\+\_\+\+PORT\textquotesingle{}, \textquotesingle{}/\+dev/\+tty\+S0\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{namespacebiometric_a71ebbbf455fe5f4270ace69fc92f2074}{biometric.\+BAUD\+\_\+\+RATE}} = int(os.\+environ.\+get(\textquotesingle{}UART\+\_\+\+BAUD\+\_\+\+RATE\textquotesingle{}, \textquotesingle{}57600\textquotesingle{}))
+\item 
+\doxymbox{\hyperlink{namespacebiometric_a1543b08ec7094f713b5d468428fbc192}{biometric.\+BACKEND\+\_\+\+URL}} = os.\+environ.\+get(\textquotesingle{}BACKEND\+\_\+\+URL\textquotesingle{}, \textquotesingle{}http:\+/\+/\+192.\+168.\+1.\+100:\+5000\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{namespacebiometric_aa97be30fe5be70b3ef0c86f02e35cdd9}{biometric.\+FRONTEND\+\_\+\+URL}} = os.\+environ.\+get(\textquotesingle{}FRONTEND\+\_\+\+URL\textquotesingle{}, \textquotesingle{}http:\+/\+/\+192.\+168.\+1.\+100:\+3000\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{namespacebiometric_a6d215dab0a37685a1a7a0f6b734e4f0a}{biometric.\+TERMINAL\+\_\+\+ID}} = os.\+environ.\+get(\textquotesingle{}TERMINAL\+\_\+\+ID\textquotesingle{}, \textquotesingle{}RVC-\/1\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{namespacebiometric_ab4833cc6b9821cd07d45efb9ab90a184}{biometric.\+LOCAL\+\_\+\+DB\+\_\+\+PATH}} = os.\+environ.\+get(\textquotesingle{}LOCAL\+\_\+\+DB\+\_\+\+PATH\textquotesingle{}, \textquotesingle{}/\+var/\+lib/\+voting/\+local\+\_\+buffer.\+db\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{namespacebiometric_a6b04c8f83f50f4f33c91f807cee2aa68}{biometric.\+CALLBACK\+\_\+\+HOST}} = os.\+environ.\+get(\textquotesingle{}TERMINAL\+\_\+\+CALLBACK\+\_\+\+HOST\textquotesingle{}, \textquotesingle{}127.\+0.\+0.\+1\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{namespacebiometric_aabfb75fea07bb7367abc8f9ff7c89274}{biometric.\+CALLBACK\+\_\+\+PORT}} = int(os.\+environ.\+get(\textquotesingle{}TERMINAL\+\_\+\+CALLBACK\+\_\+\+PORT\textquotesingle{}, \textquotesingle{}8787\textquotesingle{}))
+\item 
+\doxymbox{\hyperlink{namespacebiometric_ad7abe79d53921c2022f92a7815ce823a}{biometric.\+SESSION\+\_\+\+TIMEOUT\+\_\+\+SECONDS}} = int(os.\+environ.\+get(\textquotesingle{}SESSION\+\_\+\+TIMEOUT\+\_\+\+SECONDS\textquotesingle{}, str(15 \texorpdfstring{$\ast$}{*} 60)))
+\item 
+\doxymbox{\hyperlink{namespacebiometric_a5885b47a59c45db4a4144eb02bb74796}{biometric.\+SESSION\+\_\+\+COMPLETE}} = threading.\+Event()
+\item 
+dict \doxymbox{\hyperlink{namespacebiometric_a06df332fb0c5023e28396b73d3772498}{biometric.\+LAST\+\_\+\+COMPLETION}} = \{\}
+\end{DoxyCompactItemize}

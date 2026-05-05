@@ -1,0 +1,92 @@
+\doxysection{frontend/\+src/\+api/\+index.js File Reference}
+\hypertarget{frontend_2src_2api_2index_8js}{}\label{frontend_2src_2api_2index_8js}\index{frontend/src/api/index.js@{frontend/src/api/index.js}}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{_app_8jsx_a953be46b94f595d839e88a6d3d270309}{import}} axios from \doxymbox{\hyperlink{frontend_2src_2api_2index_8js_a4b0b2c9bd7b562218a1952cdad382fb7}{axios}}
+\item 
+\doxymbox{\hyperlink{chaincode_2voting_2index_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{frontend_2src_2api_2index_8js_a3664756536db3fccbd44330f7420eb0b}{API}}
+\item 
+export \doxymbox{\hyperlink{chaincode_2voting_2index_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{frontend_2src_2api_2index_8js_a9d2c73bd997692989157bcc60b95a47a}{fetch\+Ballot}} = () =$>$ API.\+get(\textquotesingle{}/\+voter/\+ballot\textquotesingle{})
+\item 
+export \doxymbox{\hyperlink{chaincode_2voting_2index_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{frontend_2src_2api_2index_8js_a52b11760e10e6799845dba5700d1b9a9}{cast\+Vote}}
+\item 
+export \doxymbox{\hyperlink{chaincode_2voting_2index_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{frontend_2src_2api_2index_8js_a02e76558e2adf1cc86ae536f57db3ac2}{fetch\+Results}}
+\item 
+export \doxymbox{\hyperlink{chaincode_2voting_2index_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{frontend_2src_2api_2index_8js_a718cffba099d720dd46ebe5feb5da91e}{fetch\+Stats}} = () =$>$ API.\+get(\textquotesingle{}/\+dashboard/\+stats\textquotesingle{})
+\item 
+export \doxymbox{\hyperlink{chaincode_2voting_2index_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{frontend_2src_2api_2index_8js_a8f53a345e9ec49b97a853fec22879b0f}{verify\+Transaction}}
+\end{DoxyCompactItemize}
+
+
+\label{doc-var-members}
+\Hypertarget{frontend_2src_2api_2index_8js_doc-var-members}
+\doxysubsection{Variable Documentation}
+\Hypertarget{frontend_2src_2api_2index_8js_a3664756536db3fccbd44330f7420eb0b}\index{index.js@{index.js}!API@{API}}
+\index{API@{API}!index.js@{index.js}}
+\doxysubsubsection{\texorpdfstring{API}{API}}
+{\footnotesize\ttfamily \label{frontend_2src_2api_2index_8js_a3664756536db3fccbd44330f7420eb0b} 
+export default API}
+
+{\bfseries Initial value:\+}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ =\ \doxymbox{\hyperlink{frontend_2src_2api_2index_8js_a4b0b2c9bd7b562218a1952cdad382fb7}{axios}}.create(\{}
+\DoxyCodeLine{\ \ baseURL:\ process.env.REACT\_APP\_API\_URL\ ||\ \textcolor{stringliteral}{'/api'},}
+\DoxyCodeLine{\ \ timeout:\ 10000}
+\DoxyCodeLine{\})}
+
+\end{DoxyCode}
+\Hypertarget{frontend_2src_2api_2index_8js_a4b0b2c9bd7b562218a1952cdad382fb7}\index{index.js@{index.js}!axios@{axios}}
+\index{axios@{axios}!index.js@{index.js}}
+\doxysubsubsection{\texorpdfstring{axios}{axios}}
+{\footnotesize\ttfamily \label{frontend_2src_2api_2index_8js_a4b0b2c9bd7b562218a1952cdad382fb7} 
+\doxymbox{\hyperlink{_app_8jsx_a953be46b94f595d839e88a6d3d270309}{import}} axios from axios}
+
+\Hypertarget{frontend_2src_2api_2index_8js_a52b11760e10e6799845dba5700d1b9a9}\index{index.js@{index.js}!castVote@{castVote}}
+\index{castVote@{castVote}!index.js@{index.js}}
+\doxysubsubsection{\texorpdfstring{castVote}{castVote}}
+{\footnotesize\ttfamily \label{frontend_2src_2api_2index_8js_a52b11760e10e6799845dba5700d1b9a9} 
+export \doxymbox{\hyperlink{chaincode_2voting_2index_8js_a92b303b76a3f942ea819498907d5e83c}{const}} cast\+Vote}
+
+{\bfseries Initial value:\+}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ (candidateID)\ =>}
+\DoxyCodeLine{\doxymbox{\hyperlink{frontend_2src_2api_2index_8js_a3664756536db3fccbd44330f7420eb0b}{API}}.post(\textcolor{stringliteral}{'/vote/cast'},\ \{\ candidateID\ \})}
+
+\end{DoxyCode}
+\Hypertarget{frontend_2src_2api_2index_8js_a9d2c73bd997692989157bcc60b95a47a}\index{index.js@{index.js}!fetchBallot@{fetchBallot}}
+\index{fetchBallot@{fetchBallot}!index.js@{index.js}}
+\doxysubsubsection{\texorpdfstring{fetchBallot}{fetchBallot}}
+{\footnotesize\ttfamily \label{frontend_2src_2api_2index_8js_a9d2c73bd997692989157bcc60b95a47a} 
+export \doxymbox{\hyperlink{chaincode_2voting_2index_8js_a92b303b76a3f942ea819498907d5e83c}{const}} fetch\+Ballot = () =$>$ API.\+get(\textquotesingle{}/\+voter/\+ballot\textquotesingle{})}
+
+\Hypertarget{frontend_2src_2api_2index_8js_a02e76558e2adf1cc86ae536f57db3ac2}\index{index.js@{index.js}!fetchResults@{fetchResults}}
+\index{fetchResults@{fetchResults}!index.js@{index.js}}
+\doxysubsubsection{\texorpdfstring{fetchResults}{fetchResults}}
+{\footnotesize\ttfamily \label{frontend_2src_2api_2index_8js_a02e76558e2adf1cc86ae536f57db3ac2} 
+export \doxymbox{\hyperlink{chaincode_2voting_2index_8js_a92b303b76a3f942ea819498907d5e83c}{const}} fetch\+Results}
+
+{\bfseries Initial value:\+}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ (constituencyID)\ =>}
+\DoxyCodeLine{\doxymbox{\hyperlink{frontend_2src_2api_2index_8js_a3664756536db3fccbd44330f7420eb0b}{API}}.get(\`{}/dashboard/results/\$\{constituencyID\}\`{})}
+
+\end{DoxyCode}
+\Hypertarget{frontend_2src_2api_2index_8js_a718cffba099d720dd46ebe5feb5da91e}\index{index.js@{index.js}!fetchStats@{fetchStats}}
+\index{fetchStats@{fetchStats}!index.js@{index.js}}
+\doxysubsubsection{\texorpdfstring{fetchStats}{fetchStats}}
+{\footnotesize\ttfamily \label{frontend_2src_2api_2index_8js_a718cffba099d720dd46ebe5feb5da91e} 
+export \doxymbox{\hyperlink{chaincode_2voting_2index_8js_a92b303b76a3f942ea819498907d5e83c}{const}} fetch\+Stats = () =$>$ API.\+get(\textquotesingle{}/\+dashboard/\+stats\textquotesingle{})}
+
+\Hypertarget{frontend_2src_2api_2index_8js_a8f53a345e9ec49b97a853fec22879b0f}\index{index.js@{index.js}!verifyTransaction@{verifyTransaction}}
+\index{verifyTransaction@{verifyTransaction}!index.js@{index.js}}
+\doxysubsubsection{\texorpdfstring{verifyTransaction}{verifyTransaction}}
+{\footnotesize\ttfamily \label{frontend_2src_2api_2index_8js_a8f53a345e9ec49b97a853fec22879b0f} 
+export \doxymbox{\hyperlink{chaincode_2voting_2index_8js_a92b303b76a3f942ea819498907d5e83c}{const}} verify\+Transaction}
+
+{\bfseries Initial value:\+}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ (txID)\ =>}
+\DoxyCodeLine{\doxymbox{\hyperlink{frontend_2src_2api_2index_8js_a3664756536db3fccbd44330f7420eb0b}{API}}.get(\`{}/dashboard/transaction/\$\{txID\}\`{})}
+
+\end{DoxyCode}

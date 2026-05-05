@@ -1,0 +1,90 @@
+\chapter{Low-\/\+Cost Hardware Setup }
+\hypertarget{md_hardware_2_l_o_w___c_o_s_t___s_e_t_u_p}{}\label{md_hardware_2_l_o_w___c_o_s_t___s_e_t_u_p}\index{Low-\/Cost Hardware Setup@{Low-\/Cost Hardware Setup}}
+\label{md_hardware_2_l_o_w___c_o_s_t___s_e_t_u_p_autotoc_md0}%
+\Hypertarget{md_hardware_2_l_o_w___c_o_s_t___s_e_t_u_p_autotoc_md0}%
+
+
+This project can run on a low-\/cost remote voting terminal without needing a custom industrial kiosk.\hypertarget{md_hardware_2_l_o_w___c_o_s_t___s_e_t_u_p_autotoc_md1}{}\doxysection{\texorpdfstring{Recommended Budget Build}{Recommended Budget Build}}\label{md_hardware_2_l_o_w___c_o_s_t___s_e_t_u_p_autotoc_md1}
+
+\begin{DoxyItemize}
+\item Raspberry Pi 4 Model B, 2 GB or 4 GB RAM
+\item R307 or AS608 fingerprint sensor
+\item 7-\/inch to 10-\/inch HDMI display, or a reused HDMI monitor or TV
+\item Basic USB keyboard
+\item Optional low-\/cost USB barcode scanner
+\item 5V/\+3A Raspberry Pi power adapter
+\item 32 GB micro\+SD card
+\item Plastic or acrylic enclosure
+\end{DoxyItemize}\hypertarget{md_hardware_2_l_o_w___c_o_s_t___s_e_t_u_p_autotoc_md2}{}\doxysection{\texorpdfstring{Practical Budget Strategy}{Practical Budget Strategy}}\label{md_hardware_2_l_o_w___c_o_s_t___s_e_t_u_p_autotoc_md2}
+
+\begin{DoxyItemize}
+\item Cheapest display option:\+ reuse an old HDMI monitor or small TV
+\item Cheapest input option:\+ use a USB keyboard instead of a barcode scanner at first
+\item Best value biometric option:\+ use an R307 or AS608 sensor instead of a more expensive industrial scanner
+\end{DoxyItemize}
+
+For a student prototype, the minimum practical setup is:\+
+
+
+\begin{DoxyItemize}
+\item 1 Raspberry Pi
+\item 1 fingerprint sensor
+\item 1 reused monitor
+\item 1 USB keyboard
+\end{DoxyItemize}\hypertarget{md_hardware_2_l_o_w___c_o_s_t___s_e_t_u_p_autotoc_md3}{}\doxysection{\texorpdfstring{Wiring}{Wiring}}\label{md_hardware_2_l_o_w___c_o_s_t___s_e_t_u_p_autotoc_md3}
+For an R307 or AS608 UART fingerprint sensor:\+
+
+
+\begin{DoxyItemize}
+\item {\ttfamily VCC} -\/\texorpdfstring{$>$}{>} Pi {\ttfamily 5V}
+\item {\ttfamily GND} -\/\texorpdfstring{$>$}{>} Pi {\ttfamily GND}
+\item {\ttfamily TX} -\/\texorpdfstring{$>$}{>} Pi {\ttfamily RX} on GPIO 15
+\item {\ttfamily RX} -\/\texorpdfstring{$>$}{>} Pi {\ttfamily TX} on GPIO 14
+\end{DoxyItemize}
+
+Enable UART on the Pi:\+
+
+
+\begin{DoxyEnumerate}
+\item Run {\ttfamily sudo raspi-\/config}
+\item Open {\ttfamily Interface Options}
+\item Enable {\ttfamily Serial Port}
+\item Disable the login shell over serial
+\item Reboot
+\end{DoxyEnumerate}\hypertarget{md_hardware_2_l_o_w___c_o_s_t___s_e_t_u_p_autotoc_md4}{}\doxysection{\texorpdfstring{Software Setup on the Pi}{Software Setup on the Pi}}\label{md_hardware_2_l_o_w___c_o_s_t___s_e_t_u_p_autotoc_md4}
+Install only what the terminal needs:\+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{sudo\ apt\ update}
+\DoxyCodeLine{sudo\ apt\ install\ -\/y\ python3\ python3-\/pip\ chromium-\/browser}
+\DoxyCodeLine{pip3\ install\ -\/r\ hardware/requirements.txt}
+
+\end{DoxyCode}
+
+
+Set the runtime environment:\+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{export\ BACKEND\_URL=http://YOUR\_BACKEND\_IP:5000}
+\DoxyCodeLine{export\ FRONTEND\_URL=http://YOUR\_FRONTEND\_IP:3000}
+\DoxyCodeLine{export\ TERMINAL\_ID=RVC-\/1}
+\DoxyCodeLine{export\ UART\_PORT=/dev/ttyS0}
+\DoxyCodeLine{export\ UART\_BAUD\_RATE=57600}
+\DoxyCodeLine{python3\ hardware/biometric.py}
+
+\end{DoxyCode}
+\hypertarget{md_hardware_2_l_o_w___c_o_s_t___s_e_t_u_p_autotoc_md5}{}\doxysection{\texorpdfstring{Cheapest Practical Variants}{Cheapest Practical Variants}}\label{md_hardware_2_l_o_w___c_o_s_t___s_e_t_u_p_autotoc_md5}
+
+\begin{DoxyItemize}
+\item Cheapest:\+ Raspberry Pi + fingerprint sensor + reused monitor + USB keyboard
+\item Better operator workflow:\+ add a cheap USB barcode scanner
+\item Better voter experience:\+ add a touchscreen and enclosure later
+\end{DoxyItemize}\hypertarget{md_hardware_2_l_o_w___c_o_s_t___s_e_t_u_p_autotoc_md6}{}\doxysection{\texorpdfstring{Notes}{Notes}}\label{md_hardware_2_l_o_w___c_o_s_t___s_e_t_u_p_autotoc_md6}
+
+\begin{DoxyItemize}
+\item Most USB barcode scanners behave like keyboards, so they are easy to add later.
+\item For demos, reusing an existing monitor saves a lot of cost.
+\item If internet stability is poor, keep the local SQLite buffering path enabled and test recovery thoroughly. 
+\end{DoxyItemize}

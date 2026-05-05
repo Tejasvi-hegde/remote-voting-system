@@ -2,25 +2,25 @@ const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/auth');
 const Candidate = require('../models/Candidate');
+const Voter = require('../models/Voter');
 
 /**
  * GET /api/voter/ballot
- * Protected — requires valid JWT from /api/auth/verify
+ * Protected — requires valid JWT from /api/auth/login
  *
  * Returns the list of candidates for the voter's constituency.
- * The constituency is extracted from the JWT, not from query params
- * — so a voter cannot see another constituency's ballot.
  */
 router.get('/ballot', protect, async (req, res) => {
   try {
     const { constituencyID, constituencyName } = req.voter;
 
-    const candidates = await Candidate.find(
-      { constituencyID, isActive: true },
-      { _id: 0, candidateID: 1, name: 1, party: 1, partySymbol: 1 }
-    ).sort({ name: 1 });
+    const candidates = await Candidate.findAll({
+      where: { constituencyID, isActive: true },
+      attributes: ['candidateID', 'name', 'party', 'partySymbol'],
+      order: [['name', 'ASC']]
+    });
 
-    if (!candidates.length) {
+    if (!candidates || candidates.length === 0) {
       return res.status(404).json({
         error: `No candidates found for constituency: ${constituencyName}`
       });
@@ -40,14 +40,13 @@ router.get('/ballot', protect, async (req, res) => {
 /**
  * GET /api/voter/status/:voterID
  * Check if a voter ID exists and their voting status.
- * Used by EC admin to look up a voter.
  */
 router.get('/status/:voterID', protect, async (req, res) => {
   try {
-    const voter = await require('../models/Voter').findOne(
-      { voterID: req.params.voterID.toUpperCase() },
-      { _id: 0, voterID: 1, name: 1, constituency: 1, hasVoted: 1, votedAt: 1 }
-    );
+    const voter = await Voter.findOne({
+      where: { voterID: req.params.voterID.toUpperCase() },
+      attributes: ['voterID', 'name', 'constituencyId', 'constituencyName', 'hasVoted', 'votedAt']
+    });
 
     if (!voter) {
       return res.status(404).json({ error: 'Voter not found.' });
@@ -55,6 +54,7 @@ router.get('/status/:voterID', protect, async (req, res) => {
 
     res.json({ success: true, voter });
   } catch (err) {
+    console.error('Voter lookup error:', err);
     res.status(500).json({ error: 'Lookup failed.' });
   }
 });

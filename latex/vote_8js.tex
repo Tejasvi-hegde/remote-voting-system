@@ -1,0 +1,74 @@
+\doxysection{backend/\+routes/\+vote.js File Reference}
+\hypertarget{vote_8js}{}\label{vote_8js}\index{backend/routes/vote.js@{backend/routes/vote.js}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+function \doxymbox{\hyperlink{vote_8js_a0c1db62f0421cebf9773528f233f5590}{encrypt\+Vote}} (candidate\+ID, voter\+ID)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{vote_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{vote_8js_a81e570c198204c57e1ebcace4f4e6dad}{express}} = require(\textquotesingle{}express\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{vote_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{vote_8js_a7f43c2fdec3f5b2b2d8dc821db72c367}{router}} = express.\+Router()
+\item 
+\doxymbox{\hyperlink{vote_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{vote_8js_a455e67b2fbc8d61328ed3126f5462b95}{Crypto\+JS}} = require(\textquotesingle{}\doxymbox{\hyperlink{seed_8js_a44d29f599486b46f8b3f74e5ff5e8b94}{crypto}}-\/js\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{vote_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \{ \doxymbox{\hyperlink{middleware_2auth_8js_ae3a8ad5f8291e9d2502692ec41bc811a}{protect}} \} = require(\textquotesingle{}../\+middleware/\+auth\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{vote_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{vote_8js_a43e115d280dcb01f4b5133492fe7e201}{Voter}} = require(\textquotesingle{}../\+models/\+Voter\textquotesingle{})
+\item 
+module \doxymbox{\hyperlink{vote_8js_aa4072ba4b6b56b0fb6f4801f17ab2b34}{exports}} = \doxymbox{\hyperlink{vote_8js_a7f43c2fdec3f5b2b2d8dc821db72c367}{router}}
+\end{DoxyCompactItemize}
+
+
+\label{doc-func-members}
+\Hypertarget{vote_8js_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{vote_8js_a0c1db62f0421cebf9773528f233f5590}\index{vote.js@{vote.js}!encryptVote@{encryptVote}}
+\index{encryptVote@{encryptVote}!vote.js@{vote.js}}
+\doxysubsubsection{\texorpdfstring{encryptVote()}{encryptVote()}}
+{\footnotesize\ttfamily \label{vote_8js_a0c1db62f0421cebf9773528f233f5590} 
+function encrypt\+Vote (\begin{DoxyParamCaption}\item[{}]{candidate\+ID}{, }\item[{}]{voter\+ID}{}\end{DoxyParamCaption})}
+
+Encrypt a vote using AES-\/256. The encrypted vote is what gets stored on the blockchain ledger — making the ledger publicly verifiable but vote-\/secret. 
+
+\label{doc-var-members}
+\Hypertarget{vote_8js_doc-var-members}
+\doxysubsection{Variable Documentation}
+\Hypertarget{vote_8js_a92b303b76a3f942ea819498907d5e83c}\index{vote.js@{vote.js}!const@{const}}
+\index{const@{const}!vote.js@{vote.js}}
+\doxysubsubsection{\texorpdfstring{const}{const}}
+{\footnotesize\ttfamily \label{vote_8js_a92b303b76a3f942ea819498907d5e83c} 
+const \{ \doxymbox{\hyperlink{middleware_2auth_8js_ae3a8ad5f8291e9d2502692ec41bc811a}{protect}} \} = require(\textquotesingle{}../\+middleware/\+auth\textquotesingle{})}
+
+\Hypertarget{vote_8js_a455e67b2fbc8d61328ed3126f5462b95}\index{vote.js@{vote.js}!CryptoJS@{CryptoJS}}
+\index{CryptoJS@{CryptoJS}!vote.js@{vote.js}}
+\doxysubsubsection{\texorpdfstring{CryptoJS}{CryptoJS}}
+{\footnotesize\ttfamily \label{vote_8js_a455e67b2fbc8d61328ed3126f5462b95} 
+\doxymbox{\hyperlink{vote_8js_a92b303b76a3f942ea819498907d5e83c}{const}} Crypto\+JS = require(\textquotesingle{}\doxymbox{\hyperlink{seed_8js_a44d29f599486b46f8b3f74e5ff5e8b94}{crypto}}-\/js\textquotesingle{})}
+
+\Hypertarget{vote_8js_aa4072ba4b6b56b0fb6f4801f17ab2b34}\index{vote.js@{vote.js}!exports@{exports}}
+\index{exports@{exports}!vote.js@{vote.js}}
+\doxysubsubsection{\texorpdfstring{exports}{exports}}
+{\footnotesize\ttfamily \label{vote_8js_aa4072ba4b6b56b0fb6f4801f17ab2b34} 
+module exports = \doxymbox{\hyperlink{vote_8js_a7f43c2fdec3f5b2b2d8dc821db72c367}{router}}}
+
+\Hypertarget{vote_8js_a81e570c198204c57e1ebcace4f4e6dad}\index{vote.js@{vote.js}!express@{express}}
+\index{express@{express}!vote.js@{vote.js}}
+\doxysubsubsection{\texorpdfstring{express}{express}}
+{\footnotesize\ttfamily \label{vote_8js_a81e570c198204c57e1ebcace4f4e6dad} 
+\doxymbox{\hyperlink{vote_8js_a92b303b76a3f942ea819498907d5e83c}{const}} express = require(\textquotesingle{}express\textquotesingle{})}
+
+\Hypertarget{vote_8js_a7f43c2fdec3f5b2b2d8dc821db72c367}\index{vote.js@{vote.js}!router@{router}}
+\index{router@{router}!vote.js@{vote.js}}
+\doxysubsubsection{\texorpdfstring{router}{router}}
+{\footnotesize\ttfamily \label{vote_8js_a7f43c2fdec3f5b2b2d8dc821db72c367} 
+\doxymbox{\hyperlink{vote_8js_a92b303b76a3f942ea819498907d5e83c}{const}} router = express.\+Router()}
+
+\Hypertarget{vote_8js_a43e115d280dcb01f4b5133492fe7e201}\index{vote.js@{vote.js}!Voter@{Voter}}
+\index{Voter@{Voter}!vote.js@{vote.js}}
+\doxysubsubsection{\texorpdfstring{Voter}{Voter}}
+{\footnotesize\ttfamily \label{vote_8js_a43e115d280dcb01f4b5133492fe7e201} 
+\doxymbox{\hyperlink{vote_8js_a92b303b76a3f942ea819498907d5e83c}{const}} Voter = require(\textquotesingle{}../\+models/\+Voter\textquotesingle{})}
+

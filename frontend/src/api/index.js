@@ -26,6 +26,10 @@ API.interceptors.response.use(
   }
 );
 
+export const register = (data) => API.post('/auth/register', data);
+
+export const login = (voterID, password) => API.post('/auth/login', { voterID, password });
+
 export const fetchBallot = () => API.get('/voter/ballot');
 
 export const castVote = (candidateID) =>

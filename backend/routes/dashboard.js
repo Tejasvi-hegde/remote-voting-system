@@ -1,31 +1,38 @@
 const express = require('express');
 const router = express.Router();
-const { getContract } = require('../fabric/network');
+const sequelize = require('../config/database');
 const Voter = require('../models/Voter');
+const Vote = require('../models/Vote');
 
 /**
  * GET /api/dashboard/results/:constituencyID
  *
- * Queries the blockchain (CouchDB state DB via chaincode) for vote counts.
- * Returns totals per candidate for a given constituency.
- * No auth required for results — this is publicly readable after voting.
+ * Queries the mock SQLite ledger (Vote table) for vote counts.
  */
 router.get('/results/:constituencyID', async (req, res) => {
   try {
-    const contract = await getContract();
+    const constituencyID = req.params.constituencyID;
+    
+    // Perform GROUP BY candidateID to count votes
+    const voteCounts = await Vote.findAll({
+      where: { constituencyID },
+      attributes: [
+        'candidateID',
+        [sequelize.fn('COUNT', sequelize.col('candidateID')), 'count']
+      ],
+      group: ['candidateID']
+    });
 
-    // Calls evaluateTransaction — read-only, no new block created
-    const result = await contract.evaluateTransaction(
-      'getVoteCounts',
-      req.params.constituencyID
-    );
-
-    const counts = JSON.parse(result.toString());
+    // Format the results to match frontend expectations
+    const results = {};
+    voteCounts.forEach(v => {
+      results[v.candidateID] = parseInt(v.get('count'), 10);
+    });
 
     res.json({
       success: true,
-      constituencyID: req.params.constituencyID,
-      results: counts
+      constituencyID,
+      results
     });
   } catch (err) {
     console.error('Results fetch error:', err);
@@ -39,33 +46,36 @@ router.get('/results/:constituencyID', async (req, res) => {
  */
 router.get('/stats', async (req, res) => {
   try {
-    const totalRegistered = await Voter.countDocuments({ isActive: true });
-    const totalVoted = await Voter.countDocuments({ hasVoted: true });
+    const totalRegistered = await Voter.count({ where: { isActive: true } });
+    const totalVoted = await Voter.count({ where: { hasVoted: true } });
 
     // Breakdown by constituency
-    const constituencyBreakdown = await Voter.aggregate([
-      { $match: { isActive: true } },
-      {
-        $group: {
-          _id: '$constituency.id',
-          name: { $first: '$constituency.name' },
-          state: { $first: '$constituency.state' },
-          totalRegistered: { $sum: 1 },
-          totalVoted: { $sum: { $cond: ['$hasVoted', 1, 0] } }
-        }
-      },
-      {
-        $addFields: {
-          turnoutPercent: {
-            $multiply: [
-              { $divide: ['$totalVoted', '$totalRegistered'] },
-              100
-            ]
-          }
-        }
-      },
-      { $sort: { name: 1 } }
-    ]);
+    const breakdown = await Voter.findAll({
+      where: { isActive: true },
+      attributes: [
+        ['constituencyId', 'id'],
+        ['constituencyName', 'name'],
+        ['constituencyState', 'state'],
+        [sequelize.fn('COUNT', sequelize.col('voterID')), 'totalRegistered'],
+        [sequelize.fn('SUM', sequelize.literal("CASE WHEN hasVoted = 1 THEN 1 ELSE 0 END")), 'totalVoted']
+      ],
+      group: ['constituencyId', 'constituencyName', 'constituencyState'],
+      order: [['constituencyName', 'ASC']]
+    });
+
+    const constituencyBreakdown = breakdown.map(b => {
+      const registered = parseInt(b.get('totalRegistered'), 10) || 0;
+      const voted = parseInt(b.get('totalVoted'), 10) || 0;
+      const turnoutPercent = registered > 0 ? (voted / registered) * 100 : 0;
+      return {
+        _id: b.get('id'),
+        name: b.get('name'),
+        state: b.get('state'),
+        totalRegistered: registered,
+        totalVoted: voted,
+        turnoutPercent
+      };
+    });
 
     res.json({
       success: true,
@@ -86,20 +96,26 @@ router.get('/stats', async (req, res) => {
 
 /**
  * GET /api/dashboard/transaction/:txID
- * Look up a specific transaction on the blockchain by its ID.
- * Voters can use this to verify their vote was recorded.
+ * Look up a specific transaction on the mock ledger.
  */
 router.get('/transaction/:txID', async (req, res) => {
   try {
-    const contract = await getContract();
-    const result = await contract.evaluateTransaction(
-      'getTransactionByID',
-      req.params.txID
-    );
-    const tx = JSON.parse(result.toString());
-    res.json({ success: true, transaction: tx });
+    const tx = await Vote.findOne({ where: { transactionID: req.params.txID } });
+    if (!tx) {
+      return res.status(404).json({ error: 'Transaction not found.' });
+    }
+    
+    res.json({ 
+      success: true, 
+      transaction: {
+        transactionID: tx.transactionID,
+        timestamp: tx.createdAt,
+        encryptedVote: tx.encryptedVote,
+        constituencyID: tx.constituencyID
+      } 
+    });
   } catch (err) {
-    res.status(404).json({ error: 'Transaction not found.' });
+    res.status(500).json({ error: 'Failed to retrieve transaction.' });
   }
 });
 

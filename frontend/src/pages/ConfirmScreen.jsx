@@ -17,11 +17,24 @@ function ConfirmScreen() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
 
-  const raw = sessionStorage.getItem('selected_candidate');
-  const candidate = raw ? JSON.parse(raw) : null;
+  const [candidate] = useState(() => {
+    const raw = sessionStorage.getItem('selected_candidate');
+    return raw ? JSON.parse(raw) : null;
+  });
+
+  useEffect(() => {
+    if (result) {
+      notifyTerminal(result);
+    }
+  }, [result]);
+
+  useEffect(() => {
+    if (!candidate) {
+      navigate('/ballot');
+    }
+  }, [candidate, navigate]);
 
   if (!candidate) {
-    navigate('/ballot');
     return null;
   }
 
@@ -48,12 +61,6 @@ function ConfirmScreen() {
       setSubmitting(false);
     }
   };
-
-  useEffect(() => {
-    if (result) {
-      notifyTerminal(result);
-    }
-  }, [result]);
 
   if (result) {
     return (

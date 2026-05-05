@@ -1,23 +1,38 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-/**
- * Candidate Schema
- * Stores candidates per constituency.
- * The ballot is dynamically loaded based on the voter's constituency.
- */
-const candidateSchema = new mongoose.Schema(
-  {
-    candidateID: { type: String, required: true, unique: true },
-    name: { type: String, required: true, trim: true },
-    party: { type: String, required: true, trim: true },
-    partySymbol: { type: String, trim: true },     // emoji or image URL
-    constituencyID: { type: String, required: true },
-    constituencyName: { type: String, required: true },
-    isActive: { type: Boolean, default: true }
+const Candidate = sequelize.define('Candidate', {
+  candidateID: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true
   },
-  { timestamps: true }
-);
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  party: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  partySymbol: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  constituencyID: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  constituencyName: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  isActive: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
+  }
+}, {
+  timestamps: true
+});
 
-candidateSchema.index({ constituencyID: 1 });
-
-module.exports = mongoose.model('Candidate', candidateSchema);
+module.exports = Candidate;

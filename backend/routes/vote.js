@@ -1,14 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const CryptoJS = require('crypto-js');
+const { v4: uuidv4 } = require('uuid');
 const { protect } = require('../middleware/auth');
 const Voter = require('../models/Voter');
-const { getContract } = require('../fabric/network');
+const Vote = require('../models/Vote');
 
 /**
  * Encrypt a vote using AES-256.
- * The encrypted vote is what gets stored on the blockchain ledger —
- * making the ledger publicly verifiable but vote-secret.
  */
 function encryptVote(candidateID, voterID) {
   const payload = JSON.stringify({
@@ -16,22 +15,12 @@ function encryptVote(candidateID, voterID) {
     voterID,
     timestamp: Date.now()
   });
-  return CryptoJS.AES.encrypt(payload, process.env.VOTE_ENCRYPTION_KEY).toString();
+  return CryptoJS.AES.encrypt(payload, process.env.VOTE_ENCRYPTION_KEY || 'mock_key').toString();
 }
 
 /**
  * POST /api/vote/cast
  * Protected — requires valid JWT
- *
- * Body: { candidateID }
- *
- * Flow:
- * 1. Validate JWT (middleware)
- * 2. Check voter hasn't voted (double-check in MongoDB)
- * 3. Encrypt the vote
- * 4. Submit to Hyperledger Fabric via castVote chaincode function
- * 5. Mark voter as hasVoted=true in MongoDB
- * 6. Return transaction ID
  */
 router.post('/cast', protect, async (req, res) => {
   const { voterID, constituencyID, terminalID } = req.voter;
@@ -42,8 +31,8 @@ router.post('/cast', protect, async (req, res) => {
   }
 
   try {
-    // 1. Double-check voter hasn't already voted (race condition guard)
-    const voter = await Voter.findOne({ voterID });
+    // 1. Double-check voter hasn't already voted
+    const voter = await Voter.findOne({ where: { voterID } });
     if (!voter) {
       return res.status(404).json({ error: 'Voter not found.' });
     }
@@ -54,45 +43,32 @@ router.post('/cast', protect, async (req, res) => {
     // 2. Encrypt the vote
     const encryptedVote = encryptVote(candidateID, voterID);
 
-    // 3. Submit transaction to Hyperledger Fabric
-    const contract = await getContract();
-
-    // castVote(voterID, encryptedVote, candidateID, constituencyID)
-    // The chaincode also checks for duplicate votes on-chain
-    const result = await contract.submitTransaction(
-      'castVote',
+    // 3. Simulate Blockchain Commit (Save to Vote table)
+    const transactionID = uuidv4();
+    await Vote.create({
+      transactionID,
       voterID,
-      encryptedVote,
       candidateID,
-      constituencyID
-    );
+      constituencyID,
+      encryptedVote
+    });
 
-    const txResult = JSON.parse(result.toString());
+    // 4. Update Voter status
+    await voter.update({
+      hasVoted: true,
+      votedAt: new Date(),
+      votedAtTerminal: terminalID
+    });
 
-    // 4. Update MongoDB — mark voter as voted
-    // This runs AFTER successful blockchain commit
-    await Voter.findOneAndUpdate(
-      { voterID },
-      {
-        hasVoted: true,
-        votedAt: new Date(),
-        votedAtTerminal: terminalID
-      }
-    );
-
-    console.log(`✅ Vote cast: voterID=${voterID} candidate=${candidateID} txID=${txResult.transactionID}`);
+    console.log(`✅ Vote cast mock ledger: voterID=${voterID} candidate=${candidateID} txID=${transactionID}`);
 
     res.json({
       success: true,
-      message: 'Your vote has been recorded securely.',
-      transactionID: txResult.transactionID,
-      timestamp: txResult.timestamp
+      message: 'Your vote has been recorded securely in the mock ledger.',
+      transactionID,
+      timestamp: new Date().toISOString()
     });
   } catch (err) {
-    // Handle chaincode-level rejections (e.g. duplicate vote on-chain)
-    if (err.message && err.message.includes('already voted')) {
-      return res.status(403).json({ error: 'Duplicate vote detected on blockchain.' });
-    }
     console.error('Vote cast error:', err);
     res.status(500).json({ error: 'Vote submission failed. Please try again.' });
   }

@@ -1,0 +1,146 @@
+\doxysection{backend/\+fabric/\+network.js File Reference}
+\hypertarget{network_8js}{}\label{network_8js}\index{backend/fabric/network.js@{backend/fabric/network.js}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+function \doxymbox{\hyperlink{network_8js_aa0d83cdeb5bc36658b980d8bbe6176ac}{load\+Connection\+Profile}} ()
+\item 
+function async \doxymbox{\hyperlink{network_8js_ae60fa03f65d7cec896d7ef1379b6ff81}{load\+Wallet}} ()
+\item 
+function async \doxymbox{\hyperlink{network_8js_a9713e7a2242e057d09367385c5848c40}{enroll\+Admin}} ()
+\item 
+function async \doxymbox{\hyperlink{network_8js_a417957fd4c0afb04c231ea5144aa506c}{get\+Contract}} ()
+\item 
+function async \doxymbox{\hyperlink{network_8js_ad416e0cada07cdc53b7ee172ff686c12}{disconnect}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \{ Gateway, Wallets \} = require(\textquotesingle{}fabric-\/\doxymbox{\hyperlink{network_8js_a63a7573b70527498e054d38de2af8e60}{network}}\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{network_8js_a1d588323d7b97799780d9640aec44da8}{Fabric\+CAServices}} = require(\textquotesingle{}fabric-\/ca-\/\doxymbox{\hyperlink{frontend_2src_2index_8js_af894263ecdedf097ffb82cca6444c287}{client}}\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{network_8js_a1fdc7709faf62dce60620fb3f9d3453c}{path}} = require(\textquotesingle{}path\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{network_8js_a2e47e1f004220675d0fa39b8255bd78f}{fs}} = require(\textquotesingle{}fs\textquotesingle{})
+\item 
+let \doxymbox{\hyperlink{network_8js_afcca12ebd97dd9b13b4402339274e732}{gateway}} = null
+\item 
+let \doxymbox{\hyperlink{network_8js_a63a7573b70527498e054d38de2af8e60}{network}} = null
+\item 
+module \doxymbox{\hyperlink{network_8js_aa4072ba4b6b56b0fb6f4801f17ab2b34}{exports}} = \{ \doxymbox{\hyperlink{network_8js_a417957fd4c0afb04c231ea5144aa506c}{get\+Contract}}, \doxymbox{\hyperlink{network_8js_a9713e7a2242e057d09367385c5848c40}{enroll\+Admin}}, \doxymbox{\hyperlink{network_8js_ad416e0cada07cdc53b7ee172ff686c12}{disconnect}} \}
+\end{DoxyCompactItemize}
+
+
+\label{doc-func-members}
+\Hypertarget{network_8js_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{network_8js_ad416e0cada07cdc53b7ee172ff686c12}\index{network.js@{network.js}!disconnect@{disconnect}}
+\index{disconnect@{disconnect}!network.js@{network.js}}
+\doxysubsubsection{\texorpdfstring{disconnect()}{disconnect()}}
+{\footnotesize\ttfamily \label{network_8js_ad416e0cada07cdc53b7ee172ff686c12} 
+function async disconnect (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Disconnect from the gateway gracefully. \Hypertarget{network_8js_a9713e7a2242e057d09367385c5848c40}\index{network.js@{network.js}!enrollAdmin@{enrollAdmin}}
+\index{enrollAdmin@{enrollAdmin}!network.js@{network.js}}
+\doxysubsubsection{\texorpdfstring{enrollAdmin()}{enrollAdmin()}}
+{\footnotesize\ttfamily \label{network_8js_a9713e7a2242e057d09367385c5848c40} 
+function async enroll\+Admin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Enroll the Fabric admin user and save credentials to wallet. Run once during initial setup. Here is the call graph for this function:\+
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=294pt]{network_8js_a9713e7a2242e057d09367385c5848c40_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{network_8js_a417957fd4c0afb04c231ea5144aa506c}\index{network.js@{network.js}!getContract@{getContract}}
+\index{getContract@{getContract}!network.js@{network.js}}
+\doxysubsubsection{\texorpdfstring{getContract()}{getContract()}}
+{\footnotesize\ttfamily \label{network_8js_a417957fd4c0afb04c231ea5144aa506c} 
+function async get\+Contract (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Get the smart contract (chaincode) instance. Establishes gateway connection if not already connected. Here is the call graph for this function:\+
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=294pt]{network_8js_a417957fd4c0afb04c231ea5144aa506c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{network_8js_aa0d83cdeb5bc36658b980d8bbe6176ac}\index{network.js@{network.js}!loadConnectionProfile@{loadConnectionProfile}}
+\index{loadConnectionProfile@{loadConnectionProfile}!network.js@{network.js}}
+\doxysubsubsection{\texorpdfstring{loadConnectionProfile()}{loadConnectionProfile()}}
+{\footnotesize\ttfamily \label{network_8js_aa0d83cdeb5bc36658b980d8bbe6176ac} 
+function load\+Connection\+Profile (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Load the connection profile JSON. This file describes peers, orderers, CAs, and TLS certificates. Here is the caller graph for this function:\+
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=294pt]{network_8js_aa0d83cdeb5bc36658b980d8bbe6176ac_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{network_8js_ae60fa03f65d7cec896d7ef1379b6ff81}\index{network.js@{network.js}!loadWallet@{loadWallet}}
+\index{loadWallet@{loadWallet}!network.js@{network.js}}
+\doxysubsubsection{\texorpdfstring{loadWallet()}{loadWallet()}}
+{\footnotesize\ttfamily \label{network_8js_ae60fa03f65d7cec896d7ef1379b6ff81} 
+function async load\+Wallet (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Load (or create) the wallet containing user identities. The wallet stores the enrolled user\textquotesingle{}s certificate and private key. Here is the caller graph for this function:\+
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{network_8js_ae60fa03f65d7cec896d7ef1379b6ff81_icgraph}
+\end{center}
+\end{figure}
+
+
+\label{doc-var-members}
+\Hypertarget{network_8js_doc-var-members}
+\doxysubsection{Variable Documentation}
+\Hypertarget{network_8js_a92b303b76a3f942ea819498907d5e83c}\index{network.js@{network.js}!const@{const}}
+\index{const@{const}!network.js@{network.js}}
+\doxysubsubsection{\texorpdfstring{const}{const}}
+{\footnotesize\ttfamily \label{network_8js_a92b303b76a3f942ea819498907d5e83c} 
+const \{ Gateway, Wallets \} = require(\textquotesingle{}fabric-\/\doxymbox{\hyperlink{network_8js_a63a7573b70527498e054d38de2af8e60}{network}}\textquotesingle{})}
+
+\Hypertarget{network_8js_aa4072ba4b6b56b0fb6f4801f17ab2b34}\index{network.js@{network.js}!exports@{exports}}
+\index{exports@{exports}!network.js@{network.js}}
+\doxysubsubsection{\texorpdfstring{exports}{exports}}
+{\footnotesize\ttfamily \label{network_8js_aa4072ba4b6b56b0fb6f4801f17ab2b34} 
+module exports = \{ \doxymbox{\hyperlink{network_8js_a417957fd4c0afb04c231ea5144aa506c}{get\+Contract}}, \doxymbox{\hyperlink{network_8js_a9713e7a2242e057d09367385c5848c40}{enroll\+Admin}}, \doxymbox{\hyperlink{network_8js_ad416e0cada07cdc53b7ee172ff686c12}{disconnect}} \}}
+
+\Hypertarget{network_8js_a1d588323d7b97799780d9640aec44da8}\index{network.js@{network.js}!FabricCAServices@{FabricCAServices}}
+\index{FabricCAServices@{FabricCAServices}!network.js@{network.js}}
+\doxysubsubsection{\texorpdfstring{FabricCAServices}{FabricCAServices}}
+{\footnotesize\ttfamily \label{network_8js_a1d588323d7b97799780d9640aec44da8} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} Fabric\+CAServices = require(\textquotesingle{}fabric-\/ca-\/\doxymbox{\hyperlink{frontend_2src_2index_8js_af894263ecdedf097ffb82cca6444c287}{client}}\textquotesingle{})}
+
+\Hypertarget{network_8js_a2e47e1f004220675d0fa39b8255bd78f}\index{network.js@{network.js}!fs@{fs}}
+\index{fs@{fs}!network.js@{network.js}}
+\doxysubsubsection{\texorpdfstring{fs}{fs}}
+{\footnotesize\ttfamily \label{network_8js_a2e47e1f004220675d0fa39b8255bd78f} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} fs = require(\textquotesingle{}fs\textquotesingle{})}
+
+\Hypertarget{network_8js_afcca12ebd97dd9b13b4402339274e732}\index{network.js@{network.js}!gateway@{gateway}}
+\index{gateway@{gateway}!network.js@{network.js}}
+\doxysubsubsection{\texorpdfstring{gateway}{gateway}}
+{\footnotesize\ttfamily \label{network_8js_afcca12ebd97dd9b13b4402339274e732} 
+let gateway = null}
+
+Fabric Network Helper Manages connections to the Hyperledger Fabric peer network. Implements connection pooling — one gateway per process. \Hypertarget{network_8js_a63a7573b70527498e054d38de2af8e60}\index{network.js@{network.js}!network@{network}}
+\index{network@{network}!network.js@{network.js}}
+\doxysubsubsection{\texorpdfstring{network}{network}}
+{\footnotesize\ttfamily \label{network_8js_a63a7573b70527498e054d38de2af8e60} 
+let network = null}
+
+\Hypertarget{network_8js_a1fdc7709faf62dce60620fb3f9d3453c}\index{network.js@{network.js}!path@{path}}
+\index{path@{path}!network.js@{network.js}}
+\doxysubsubsection{\texorpdfstring{path}{path}}
+{\footnotesize\ttfamily \label{network_8js_a1fdc7709faf62dce60620fb3f9d3453c} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} path = require(\textquotesingle{}path\textquotesingle{})}
+

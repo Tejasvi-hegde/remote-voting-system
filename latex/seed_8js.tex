@@ -1,0 +1,98 @@
+\doxysection{backend/\+seed.js File Reference}
+\hypertarget{seed_8js}{}\label{seed_8js}\index{backend/seed.js@{backend/seed.js}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+function async \doxymbox{\hyperlink{seed_8js_a959c145ca82e155568900eaf9638a902}{seed}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{seed_8js_afb9c0464d485a1268d1a49e2e4c8590e}{mongoose}} = require(\textquotesingle{}mongoose\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{seed_8js_a44d29f599486b46f8b3f74e5ff5e8b94}{crypto}} = require(\textquotesingle{}crypto\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{seed_8js_a43e115d280dcb01f4b5133492fe7e201}{Voter}} = require(\textquotesingle{}./\+models/\+Voter\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{seed_8js_a99035736960d8828eafb42fee067f5c0}{Candidate}} = require(\textquotesingle{}./\+models/\+Candidate\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{seed_8js_af3593c9aa68b7e4e15110dc2715f5acb}{fake\+Hash}} = (str) =$>$ crypto.\+create\+Hash(\textquotesingle{}sha256\textquotesingle{}).update(str).digest(\textquotesingle{}hex\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{seed_8js_a56eeedc2f14fabb61e06f84ecdb91e17}{candidates}}
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{seed_8js_a9a22922a9946ab27d4462141102d6787}{voters}}
+\end{DoxyCompactItemize}
+
+
+\label{doc-func-members}
+\Hypertarget{seed_8js_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{seed_8js_a959c145ca82e155568900eaf9638a902}\index{seed.js@{seed.js}!seed@{seed}}
+\index{seed@{seed}!seed.js@{seed.js}}
+\doxysubsubsection{\texorpdfstring{seed()}{seed()}}
+{\footnotesize\ttfamily \label{seed_8js_a959c145ca82e155568900eaf9638a902} 
+function async seed (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+\label{doc-var-members}
+\Hypertarget{seed_8js_doc-var-members}
+\doxysubsection{Variable Documentation}
+\Hypertarget{seed_8js_a99035736960d8828eafb42fee067f5c0}\index{seed.js@{seed.js}!Candidate@{Candidate}}
+\index{Candidate@{Candidate}!seed.js@{seed.js}}
+\doxysubsubsection{\texorpdfstring{Candidate}{Candidate}}
+{\footnotesize\ttfamily \label{seed_8js_a99035736960d8828eafb42fee067f5c0} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} Candidate = require(\textquotesingle{}./\+models/\+Candidate\textquotesingle{})}
+
+\Hypertarget{seed_8js_a56eeedc2f14fabb61e06f84ecdb91e17}\index{seed.js@{seed.js}!candidates@{candidates}}
+\index{candidates@{candidates}!seed.js@{seed.js}}
+\doxysubsubsection{\texorpdfstring{candidates}{candidates}}
+{\footnotesize\ttfamily \label{seed_8js_a56eeedc2f14fabb61e06f84ecdb91e17} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} candidates}
+
+{\bfseries Initial value:\+}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ [}
+\DoxyCodeLine{\ \ }
+\DoxyCodeLine{\ \ \{\ candidateID:\ \textcolor{stringliteral}{'C001'},\ name:\ \textcolor{stringliteral}{'Arjun\ Sharma'},\ party:\ \textcolor{stringliteral}{'National\ Democratic\ Alliance'},\ partySymbol:\ \textcolor{stringliteral}{'🪷'},\ constituencyID:\ \textcolor{stringliteral}{'KA-\/001'},\ constituencyName:\ \textcolor{stringliteral}{'Bengaluru\ North'}\ \},}
+\DoxyCodeLine{\ \ \{\ candidateID:\ \textcolor{stringliteral}{'C002'},\ name:\ \textcolor{stringliteral}{'Priya\ Nair'},\ party:\ \textcolor{stringliteral}{'Indian\ National\ Congress'},\ partySymbol:\ \textcolor{stringliteral}{'✋'},\ constituencyID:\ \textcolor{stringliteral}{'KA-\/001'},\ constituencyName:\ \textcolor{stringliteral}{'Bengaluru\ North'}\ \},}
+\DoxyCodeLine{\ \ \{\ candidateID:\ \textcolor{stringliteral}{'C003'},\ name:\ \textcolor{stringliteral}{'Ravi\ Kumar'},\ party:\ \textcolor{stringliteral}{'Aam\ Aadmi\ Party'},\ partySymbol:\ \textcolor{stringliteral}{'🧹'},\ constituencyID:\ \textcolor{stringliteral}{'KA-\/001'},\ constituencyName:\ \textcolor{stringliteral}{'Bengaluru\ North'}\ \},}
+\DoxyCodeLine{\ \ \{\ candidateID:\ \textcolor{stringliteral}{'C004'},\ name:\ \textcolor{stringliteral}{'Sunita\ Reddy'},\ party:\ \textcolor{stringliteral}{'Independent'},\ partySymbol:\ \textcolor{stringliteral}{'⭐'},\ constituencyID:\ \textcolor{stringliteral}{'KA-\/001'},\ constituencyName:\ \textcolor{stringliteral}{'Bengaluru\ North'}\ \},}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ }
+\DoxyCodeLine{\ \ \{\ candidateID:\ \textcolor{stringliteral}{'C005'},\ name:\ \textcolor{stringliteral}{'Vijay\ Patil'},\ party:\ \textcolor{stringliteral}{'National\ Democratic\ Alliance'},\ partySymbol:\ \textcolor{stringliteral}{'🪷'},\ constituencyID:\ \textcolor{stringliteral}{'MH-\/001'},\ constituencyName:\ \textcolor{stringliteral}{'Mumbai\ South'}\ \},}
+\DoxyCodeLine{\ \ \{\ candidateID:\ \textcolor{stringliteral}{'C006'},\ name:\ \textcolor{stringliteral}{'Ananya\ Desai'},\ party:\ \textcolor{stringliteral}{'Indian\ National\ Congress'},\ partySymbol:\ \textcolor{stringliteral}{'✋'},\ constituencyID:\ \textcolor{stringliteral}{'MH-\/001'},\ constituencyName:\ \textcolor{stringliteral}{'Mumbai\ South'}\ \},}
+\DoxyCodeLine{\ \ \{\ candidateID:\ \textcolor{stringliteral}{'C007'},\ name:\ \textcolor{stringliteral}{'Rahul\ Mehta'},\ party:\ \textcolor{stringliteral}{'Shiv\ Sena'},\ partySymbol:\ \textcolor{stringliteral}{'🏹'},\ constituencyID:\ \textcolor{stringliteral}{'MH-\/001'},\ constituencyName:\ \textcolor{stringliteral}{'Mumbai\ South'}\ \},}
+\DoxyCodeLine{]}
+
+\end{DoxyCode}
+\Hypertarget{seed_8js_a44d29f599486b46f8b3f74e5ff5e8b94}\index{seed.js@{seed.js}!crypto@{crypto}}
+\index{crypto@{crypto}!seed.js@{seed.js}}
+\doxysubsubsection{\texorpdfstring{crypto}{crypto}}
+{\footnotesize\ttfamily \label{seed_8js_a44d29f599486b46f8b3f74e5ff5e8b94} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} crypto = require(\textquotesingle{}crypto\textquotesingle{})}
+
+\Hypertarget{seed_8js_af3593c9aa68b7e4e15110dc2715f5acb}\index{seed.js@{seed.js}!fakeHash@{fakeHash}}
+\index{fakeHash@{fakeHash}!seed.js@{seed.js}}
+\doxysubsubsection{\texorpdfstring{fakeHash}{fakeHash}}
+{\footnotesize\ttfamily \label{seed_8js_af3593c9aa68b7e4e15110dc2715f5acb} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} fake\+Hash = (str) =$>$ crypto.\+create\+Hash(\textquotesingle{}sha256\textquotesingle{}).update(str).digest(\textquotesingle{}hex\textquotesingle{})}
+
+\Hypertarget{seed_8js_afb9c0464d485a1268d1a49e2e4c8590e}\index{seed.js@{seed.js}!mongoose@{mongoose}}
+\index{mongoose@{mongoose}!seed.js@{seed.js}}
+\doxysubsubsection{\texorpdfstring{mongoose}{mongoose}}
+{\footnotesize\ttfamily \label{seed_8js_afb9c0464d485a1268d1a49e2e4c8590e} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} mongoose = require(\textquotesingle{}mongoose\textquotesingle{})}
+
+\Hypertarget{seed_8js_a43e115d280dcb01f4b5133492fe7e201}\index{seed.js@{seed.js}!Voter@{Voter}}
+\index{Voter@{Voter}!seed.js@{seed.js}}
+\doxysubsubsection{\texorpdfstring{Voter}{Voter}}
+{\footnotesize\ttfamily \label{seed_8js_a43e115d280dcb01f4b5133492fe7e201} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} Voter = require(\textquotesingle{}./\+models/\+Voter\textquotesingle{})}
+
+\Hypertarget{seed_8js_a9a22922a9946ab27d4462141102d6787}\index{seed.js@{seed.js}!voters@{voters}}
+\index{voters@{voters}!seed.js@{seed.js}}
+\doxysubsubsection{\texorpdfstring{voters}{voters}}
+{\footnotesize\ttfamily \label{seed_8js_a9a22922a9946ab27d4462141102d6787} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} voters}
+

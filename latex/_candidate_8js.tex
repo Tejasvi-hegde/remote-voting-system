@@ -1,0 +1,50 @@
+\doxysection{backend/\+models/\+\+Candidate.js File Reference}
+\hypertarget{_candidate_8js}{}\label{_candidate_8js}\index{backend/models/Candidate.js@{backend/models/Candidate.js}}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{_candidate_8js_afb9c0464d485a1268d1a49e2e4c8590e}{mongoose}} = require(\textquotesingle{}mongoose\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} \doxymbox{\hyperlink{_candidate_8js_a1c94614afc9befec053e1a577a049f76}{candidate\+Schema}}
+\item 
+module \doxymbox{\hyperlink{_candidate_8js_aa4072ba4b6b56b0fb6f4801f17ab2b34}{exports}} = mongoose.\+model(\textquotesingle{}\doxymbox{\hyperlink{routes_2_voter_8js_a99035736960d8828eafb42fee067f5c0}{Candidate}}\textquotesingle{}, \doxymbox{\hyperlink{_candidate_8js_a1c94614afc9befec053e1a577a049f76}{candidate\+Schema}})
+\end{DoxyCompactItemize}
+
+
+\label{doc-var-members}
+\Hypertarget{_candidate_8js_doc-var-members}
+\doxysubsection{Variable Documentation}
+\Hypertarget{_candidate_8js_a1c94614afc9befec053e1a577a049f76}\index{Candidate.js@{Candidate.js}!candidateSchema@{candidateSchema}}
+\index{candidateSchema@{candidateSchema}!Candidate.js@{Candidate.js}}
+\doxysubsubsection{\texorpdfstring{candidateSchema}{candidateSchema}}
+{\footnotesize\ttfamily \label{_candidate_8js_a1c94614afc9befec053e1a577a049f76} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} candidate\+Schema}
+
+{\bfseries Initial value:\+}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{new}\ \doxymbox{\hyperlink{_candidate_8js_afb9c0464d485a1268d1a49e2e4c8590e}{mongoose}}.Schema(}
+\DoxyCodeLine{\ \ \{}
+\DoxyCodeLine{\ \ \ \ candidateID:\ \{\ type:\ String,\ required:\ \textcolor{keyword}{true},\ unique:\ \textcolor{keyword}{true}\ \},}
+\DoxyCodeLine{\ \ \ \ name:\ \{\ type:\ String,\ required:\ \textcolor{keyword}{true},\ trim:\ \textcolor{keyword}{true}\ \},}
+\DoxyCodeLine{\ \ \ \ party:\ \{\ type:\ String,\ required:\ \textcolor{keyword}{true},\ trim:\ \textcolor{keyword}{true}\ \},}
+\DoxyCodeLine{\ \ \ \ partySymbol:\ \{\ type:\ String,\ trim:\ \textcolor{keyword}{true}\ \},\ \ \ \ \ }
+\DoxyCodeLine{\ \ \ \ constituencyID:\ \{\ type:\ String,\ required:\ \textcolor{keyword}{true}\ \},}
+\DoxyCodeLine{\ \ \ \ constituencyName:\ \{\ type:\ String,\ required:\ \textcolor{keyword}{true}\ \},}
+\DoxyCodeLine{\ \ \ \ isActive:\ \{\ type:\ Boolean,\ \textcolor{keywordflow}{default}:\ \textcolor{keyword}{true}\ \}}
+\DoxyCodeLine{\ \ \},}
+\DoxyCodeLine{\ \ \{\ timestamps:\ \textcolor{keyword}{true}\ \}}
+\DoxyCodeLine{)}
+
+\end{DoxyCode}
+Candidate Schema Stores candidates per constituency. The ballot is dynamically loaded based on the voter\textquotesingle{}s constituency. \Hypertarget{_candidate_8js_aa4072ba4b6b56b0fb6f4801f17ab2b34}\index{Candidate.js@{Candidate.js}!exports@{exports}}
+\index{exports@{exports}!Candidate.js@{Candidate.js}}
+\doxysubsubsection{\texorpdfstring{exports}{exports}}
+{\footnotesize\ttfamily \label{_candidate_8js_aa4072ba4b6b56b0fb6f4801f17ab2b34} 
+module exports = mongoose.\+model(\textquotesingle{}\doxymbox{\hyperlink{routes_2_voter_8js_a99035736960d8828eafb42fee067f5c0}{Candidate}}\textquotesingle{}, \doxymbox{\hyperlink{_candidate_8js_a1c94614afc9befec053e1a577a049f76}{candidate\+Schema}})}
+
+\Hypertarget{_candidate_8js_afb9c0464d485a1268d1a49e2e4c8590e}\index{Candidate.js@{Candidate.js}!mongoose@{mongoose}}
+\index{mongoose@{mongoose}!Candidate.js@{Candidate.js}}
+\doxysubsubsection{\texorpdfstring{mongoose}{mongoose}}
+{\footnotesize\ttfamily \label{_candidate_8js_afb9c0464d485a1268d1a49e2e4c8590e} 
+\doxymbox{\hyperlink{network_8js_a92b303b76a3f942ea819498907d5e83c}{const}} mongoose = require(\textquotesingle{}mongoose\textquotesingle{})}
+

@@ -1,0 +1,130 @@
+\doxysection{enroll Namespace Reference}
+\hypertarget{namespaceenroll}{}\label{namespaceenroll}\index{enroll@{enroll}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{namespaceenroll_abca5ac00d9da59a3911bbb0aad16a325}{connect\+\_\+sensor}} ()
+\item 
+\doxymbox{\hyperlink{namespaceenroll_a56285c7528947f1233a25d206cd50c30}{capture\+\_\+fingerprint\+\_\+hash}} (sensor, sample\+\_\+count=2)
+\item 
+\doxymbox{\hyperlink{namespaceenroll_a415de225733819db13b7b2bd976fbdce}{register\+\_\+voter}} (voter\+\_\+id, name, biometric\+\_\+hash, constituency)
+\item 
+\doxymbox{\hyperlink{namespaceenroll_a066186c55e8aa970b6e22addaecb16b5}{main}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{namespaceenroll_a724d7a1e72163800b521ba662ca37fae}{UART\+\_\+\+PORT}} = os.\+environ.\+get(\textquotesingle{}UART\+\_\+\+PORT\textquotesingle{}, \textquotesingle{}/\+dev/\+tty\+S0\textquotesingle{})
+\item 
+\doxymbox{\hyperlink{namespaceenroll_a4fa547dcd7cdd5ce7d6ba6c1638c55a3}{BAUD\+\_\+\+RATE}} = int(os.\+environ.\+get(\textquotesingle{}UART\+\_\+\+BAUD\+\_\+\+RATE\textquotesingle{}, \textquotesingle{}57600\textquotesingle{}))
+\item 
+\doxymbox{\hyperlink{namespaceenroll_a0379a3b614e9a793bd33ae20009d6257}{BACKEND\+\_\+\+URL}} = os.\+environ.\+get(\textquotesingle{}BACKEND\+\_\+\+URL\textquotesingle{}, \textquotesingle{}http:\+/\+/\+192.\+168.\+1.\+100:\+5000\textquotesingle{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}enroll.py - Fingerprint Enrollment Script
+=========================================
+Run this once per voter during the registration/pre-enrollment phase.
+It captures the voter's fingerprint, extracts the template, computes
+its SHA-256 hash, and sends it to the backend for storage.
+
+Hardware: Raspberry Pi 4 + R307/AS608 fingerprint sensor
+UART:     /dev/ttyS0 (GPIO 14/15), baud 57600
+\end{DoxyVerb}
+ 
+
+\label{doc-func-members}
+\Hypertarget{namespaceenroll_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{namespaceenroll_a56285c7528947f1233a25d206cd50c30}\index{enroll@{enroll}!capture\_fingerprint\_hash@{capture\_fingerprint\_hash}}
+\index{capture\_fingerprint\_hash@{capture\_fingerprint\_hash}!enroll@{enroll}}
+\doxysubsubsection{\texorpdfstring{capture\_fingerprint\_hash()}{capture\_fingerprint\_hash()}}
+{\footnotesize\ttfamily \label{namespaceenroll_a56285c7528947f1233a25d206cd50c30} 
+enroll.\+capture\+\_\+fingerprint\+\_\+hash (\begin{DoxyParamCaption}\item[{}]{sensor}{, }\item[{}]{sample\+\_\+count}{ = {\ttfamily 2}}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Capture the fingerprint twice, merge templates, and return the hash.
+\end{DoxyVerb}
+ Here is the caller graph for this function:\+
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{namespaceenroll_a56285c7528947f1233a25d206cd50c30_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespaceenroll_abca5ac00d9da59a3911bbb0aad16a325}\index{enroll@{enroll}!connect\_sensor@{connect\_sensor}}
+\index{connect\_sensor@{connect\_sensor}!enroll@{enroll}}
+\doxysubsubsection{\texorpdfstring{connect\_sensor()}{connect\_sensor()}}
+{\footnotesize\ttfamily \label{namespaceenroll_abca5ac00d9da59a3911bbb0aad16a325} 
+enroll.\+connect\+\_\+sensor (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Initialize UART connection to the fingerprint sensor.\end{DoxyVerb}
+ Here is the caller graph for this function:\+
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=291pt]{namespaceenroll_abca5ac00d9da59a3911bbb0aad16a325_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespaceenroll_a066186c55e8aa970b6e22addaecb16b5}\index{enroll@{enroll}!main@{main}}
+\index{main@{main}!enroll@{enroll}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{namespaceenroll_a066186c55e8aa970b6e22addaecb16b5} 
+enroll.\+main (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Here is the call graph for this function:\+
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{namespaceenroll_a066186c55e8aa970b6e22addaecb16b5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function:\+
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=143pt]{namespaceenroll_a066186c55e8aa970b6e22addaecb16b5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespaceenroll_a415de225733819db13b7b2bd976fbdce}\index{enroll@{enroll}!register\_voter@{register\_voter}}
+\index{register\_voter@{register\_voter}!enroll@{enroll}}
+\doxysubsubsection{\texorpdfstring{register\_voter()}{register\_voter()}}
+{\footnotesize\ttfamily \label{namespaceenroll_a415de225733819db13b7b2bd976fbdce} 
+enroll.\+register\+\_\+voter (\begin{DoxyParamCaption}\item[{}]{voter\+\_\+id}{, }\item[{}]{name}{, }\item[{}]{biometric\+\_\+hash}{, }\item[{}]{constituency}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Send voter registration data to the backend.\end{DoxyVerb}
+ Here is the caller graph for this function:\+
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=281pt]{namespaceenroll_a415de225733819db13b7b2bd976fbdce_icgraph}
+\end{center}
+\end{figure}
+
+
+\label{doc-var-members}
+\Hypertarget{namespaceenroll_doc-var-members}
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespaceenroll_a0379a3b614e9a793bd33ae20009d6257}\index{enroll@{enroll}!BACKEND\_URL@{BACKEND\_URL}}
+\index{BACKEND\_URL@{BACKEND\_URL}!enroll@{enroll}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_URL}{BACKEND\_URL}}
+{\footnotesize\ttfamily \label{namespaceenroll_a0379a3b614e9a793bd33ae20009d6257} 
+enroll.\+BACKEND\+\_\+\+URL = os.\+environ.\+get(\textquotesingle{}BACKEND\+\_\+\+URL\textquotesingle{}, \textquotesingle{}http:\+/\+/\+192.\+168.\+1.\+100:\+5000\textquotesingle{})}
+
+\Hypertarget{namespaceenroll_a4fa547dcd7cdd5ce7d6ba6c1638c55a3}\index{enroll@{enroll}!BAUD\_RATE@{BAUD\_RATE}}
+\index{BAUD\_RATE@{BAUD\_RATE}!enroll@{enroll}}
+\doxysubsubsection{\texorpdfstring{BAUD\_RATE}{BAUD\_RATE}}
+{\footnotesize\ttfamily \label{namespaceenroll_a4fa547dcd7cdd5ce7d6ba6c1638c55a3} 
+enroll.\+BAUD\+\_\+\+RATE = int(os.\+environ.\+get(\textquotesingle{}UART\+\_\+\+BAUD\+\_\+\+RATE\textquotesingle{}, \textquotesingle{}57600\textquotesingle{}))}
+
+\Hypertarget{namespaceenroll_a724d7a1e72163800b521ba662ca37fae}\index{enroll@{enroll}!UART\_PORT@{UART\_PORT}}
+\index{UART\_PORT@{UART\_PORT}!enroll@{enroll}}
+\doxysubsubsection{\texorpdfstring{UART\_PORT}{UART\_PORT}}
+{\footnotesize\ttfamily \label{namespaceenroll_a724d7a1e72163800b521ba662ca37fae} 
+enroll.\+UART\+\_\+\+PORT = os.\+environ.\+get(\textquotesingle{}UART\+\_\+\+PORT\textquotesingle{}, \textquotesingle{}/\+dev/\+tty\+S0\textquotesingle{})}
+

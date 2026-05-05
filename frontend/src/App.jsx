@@ -1,70 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import AuthScreen from './pages/AuthScreen';
+import LoginScreen from './pages/LoginScreen';
+import RegisterScreen from './pages/RegisterScreen';
 import BallotScreen from './pages/BallotScreen';
 import ConfirmScreen from './pages/ConfirmScreen';
 import Dashboard from './pages/Dashboard';
 import './App.css';
 
 /**
- * App — Root component
- *
- * Token flow:
- * The Raspberry Pi opens this app with ?token=<JWT> in the URL.
- * We store it in sessionStorage (clears when browser closes).
- * Protected routes check sessionStorage for a valid token.
+ * App — Root component for Mock Drill
  */
 function App() {
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    // Extract token from URL (set by Pi terminal)
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
-    const terminalID = params.get('terminal');
-    const terminalCallback = params.get('terminalCallback');
-
-    if (token) {
-      sessionStorage.setItem('voting_token', token);
-    }
-    if (terminalID) {
-      sessionStorage.setItem('terminal_id', terminalID);
-    }
-    if (terminalCallback) {
-      sessionStorage.setItem('terminal_callback', terminalCallback);
-    }
-    if (token || terminalID || terminalCallback) {
-      // Clean terminal session details from the URL without reload.
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-    setReady(true);
-  }, []);
-
-  if (!ready) return null;
-
   return (
     <BrowserRouter>
       <div className="app">
         <Routes>
-          {/* Voting terminal screens */}
-          <Route path="/" element={<AuthScreen />} />
+          {/* Voting terminal screens (Mock Drill) */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/login" element={<LoginScreen />} />
+          <Route path="/register" element={<RegisterScreen />} />
+          
           <Route path="/ballot" element={<ProtectedRoute><BallotScreen /></ProtectedRoute>} />
           <Route path="/confirm" element={<ProtectedRoute><ConfirmScreen /></ProtectedRoute>} />
 
           {/* EC Admin dashboard — separate route, no auth needed */}
           <Route path="/dashboard" element={<Dashboard />} />
 
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </div>
     </BrowserRouter>
   );
 }
 
-// Redirect to home if no token in session
+// Redirect to login if no token in session
 function ProtectedRoute({ children }) {
   const token = sessionStorage.getItem('voting_token');
-  if (!token) return <Navigate to="/" replace />;
+  if (!token) return <Navigate to="/login" replace />;
   return children;
 }
 
