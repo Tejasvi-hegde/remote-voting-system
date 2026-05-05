@@ -1,7 +1,0 @@
-<map id="getContract" name="getContract">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,95,57"/>
-<area shape="rect" id="Node000002" href="$network_8js.html#aa0d83cdeb5bc36658b980d8bbe6176ac" title=" " alt="" coords="143,5,291,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,35,130,31,125,33,96,40"/>
-<area shape="rect" id="Node000003" href="$network_8js.html#ae60fa03f65d7cec896d7ef1379b6ff81" title=" " alt="" coords="176,56,258,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="95,48,163,60,159,62,95,53"/>
-</map>

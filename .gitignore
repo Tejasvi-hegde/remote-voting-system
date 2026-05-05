@@ -20,6 +20,10 @@ dist/
 build/
 coverage/
 
+# Generated documentation
+html/
+latex/
+
 # Python cache and virtual environments
 __pycache__/
 *.py[cod]
