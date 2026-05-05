@@ -1,0 +1,6 @@
+node_modules/
+.env
+backend/blockchain/blockchain.json
+backend/package-lock.json
+frontend/package-lock.json
+.DS_Store

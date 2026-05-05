@@ -149,15 +149,22 @@ def capture_and_hash(sensor):
     sensor.convertImage(FINGERPRINT_CHARBUFFER1)
 
     characteristics = sensor.downloadCharacteristics(FINGERPRINT_CHARBUFFER1)
-    template_bytes = bytes(characteristics)
-    sha256_hash = hashlib.sha256(template_bytes).hexdigest()
+    
+    ascii_lines = ['FP_TEMPLATE_V1']
+    for i, val in enumerate(characteristics):
+        ascii_lines.append(f'byte_{i:04d}:{val:08b}')
+    template_str = '\n'.join(ascii_lines)
+    with open('/tmp/scan_fp.txt', 'w') as fp_file:
+        fp_file.write(template_str)
+    
+    fingerprint_ascii = open('/tmp/scan_fp.txt').read()
 
-    return sha256_hash
+    return fingerprint_ascii
 
 
 # ── Backend Communication ─────────────────────────────────────────────────────
 
-def verify_voter(voter_id, biometric_hash):
+def verify_voter(voter_id, fingerprint_ascii):
     """
     Call backend /api/auth/verify with voter credentials.
 
@@ -170,7 +177,7 @@ def verify_voter(voter_id, biometric_hash):
             f'{BACKEND_URL}/api/auth/verify',
             json={
                 'voterID': voter_id,
-                'biometricHash': biometric_hash,
+                'fingerprintAscii': fingerprint_ascii,
                 'terminalID': TERMINAL_ID
             },
             timeout=10
@@ -178,7 +185,7 @@ def verify_voter(voter_id, biometric_hash):
 
         data = response.json()
 
-        if response.status_code == 200 and data.get('success'):
+        if response.status_code == 200 and data.get('token'):
             return data
         else:
             print(f'⚠️  Auth failed: {data.get("error", "Unknown error")}')
@@ -258,7 +265,7 @@ def main():
 
         # ── Step 2: Capture Fingerprint ──────────────────────────────────
         try:
-            biometric_hash = capture_and_hash(sensor)
+            fingerprint_ascii = capture_and_hash(sensor)
         except TimeoutError as e:
             print(f'❌ {e}')
             continue
@@ -268,7 +275,7 @@ def main():
 
         # ── Step 3: Verify with Backend ──────────────────────────────────
         print('\n🔍 Verifying identity...')
-        result = verify_voter(voter_id, biometric_hash)
+        result = verify_voter(voter_id, fingerprint_ascii)
 
         if not result:
             print('\n❌ Authentication failed.')

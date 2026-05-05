@@ -4,6 +4,7 @@ import AuthScreen from './pages/AuthScreen';
 import BallotScreen from './pages/BallotScreen';
 import ConfirmScreen from './pages/ConfirmScreen';
 import Dashboard from './pages/Dashboard';
+import AdminScreen from './pages/AdminScreen';
 import './App.css';
 
 /**
@@ -42,6 +43,7 @@ function App() {
 
           {/* EC Admin dashboard — separate route, no auth needed */}
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin" element={<AdminScreen />} />
 
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

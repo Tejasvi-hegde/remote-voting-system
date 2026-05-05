@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { fetchStats, fetchResults, verifyTransaction } from '../api';
+import { fetchStats, fetchResults, verifyTransaction, fetchBlockchain } from '../api';
 
 /**
  * Dashboard — Election Commission Admin View
@@ -21,6 +21,7 @@ function Dashboard() {
   const [txError, setTxError] = useState('');
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [chainData, setChainData] = useState([]);
 
   const loadStats = useCallback(() => {
     fetchStats()
@@ -34,6 +35,10 @@ function Dashboard() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
+
+    fetchBlockchain()
+      .then(({ data }) => setChainData(data.chain))
+      .catch(console.error);
   }, [selectedConstituency]);
 
   useEffect(() => {
@@ -193,6 +198,41 @@ function Dashboard() {
             </table>
           </div>
         )}
+      </div>
+
+      {/* Blockchain Explorer Proof */}
+      <div className="dash-panel" style={{ marginTop: '2rem' }}>
+        <h3>⛓️ Live Blockchain Ledger (Proof of Immutability)</h3>
+        <p style={{ color: '#aaa', marginBottom: '1rem' }}>
+          This is the raw cryptographically linked chain of blocks. Each vote is a new block containing a hash of the previous block, making tampering mathematically impossible.
+        </p>
+        
+        <div className="blockchain-explorer" style={{ display: 'flex', overflowX: 'auto', gap: '1rem', paddingBottom: '1rem' }}>
+          {chainData.map((block) => (
+            <div key={block.hash} style={{ minWidth: '300px', backgroundColor: '#1a202c', border: '1px solid #4a5568', borderRadius: '8px', padding: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #2d3748', paddingBottom: '0.5rem', marginBottom: '0.5rem' }}>
+                <strong>Block #{block.index}</strong>
+                <span style={{ fontSize: '0.8rem', color: '#a0aec0' }}>{new Date(block.timestamp).toLocaleTimeString()}</span>
+              </div>
+              <div style={{ fontSize: '0.8rem', wordBreak: 'break-all', fontFamily: 'monospace' }}>
+                <p style={{ color: '#ed8936' }}><strong>Hash:</strong><br/>{block.hash}</p>
+                <p style={{ color: '#4299e1' }}><strong>Prev Hash:</strong><br/>{block.previousHash || 'Genesis (None)'}</p>
+                <div style={{ marginTop: '0.5rem', backgroundColor: '#2d3748', padding: '0.5rem', borderRadius: '4px' }}>
+                  <p><strong>Data Payload:</strong></p>
+                  {block.index === 0 ? (
+                    <p style={{ color: '#68d391' }}>{block.data.message}</p>
+                  ) : (
+                    <>
+                      <p>Voter: ***{block.data.voterID.slice(-3)}</p>
+                      <p>Constituency: {block.data.constituency}</p>
+                      <p style={{ color: '#68d391' }}>Vote: [ENCRYPTED]</p>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

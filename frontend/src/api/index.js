@@ -39,4 +39,6 @@ export const fetchStats = () => API.get('/dashboard/stats');
 export const verifyTransaction = (txID) =>
   API.get(`/dashboard/transaction/${txID}`);
 
+export const fetchBlockchain = () => API.get('/dashboard/blockchain');
+
 export default API;

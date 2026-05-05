@@ -48,10 +48,10 @@ voting-system/
 |-------|-----------|
 | Frontend | React.js + React Router |
 | Backend | Node.js + Express.js |
-| Database | MongoDB (voter registry) |
-| Blockchain | Hyperledger Fabric 2.5 |
+| Database | MySQL via mysql2 (replaces MongoDB/SQLite) |
+| Blockchain | Custom JS Blockchain, file-persisted as blockchain.json (replaces Hyperledger Fabric) |
 | Smart Contract | JavaScript Chaincode |
-| State DB | CouchDB (vote counts via Fabric) |
+| State DB | Removed (CouchDB no longer used) |
 | Biometric | R307/AS608 fingerprint sensor (UART) |
 | Hardware | Raspberry Pi 4 |
 | Encryption | AES-256 (votes) + SHA-256 (biometric hash) |
@@ -90,31 +90,20 @@ cp backend/.env.example backend/.env
 # Edit backend/.env — set JWT_SECRET and VOTE_ENCRYPTION_KEY
 ```
 
-### 3. Start Docker services
-```bash
-docker-compose -f docker/docker-compose.yml up -d mongodb couchdb
-```
+### 3. Start Docker services (optional)
+MySQL server is running locally on the laptop. Start other services:
+docker-compose -f docker/docker-compose.yml up -d
 
 ### 4. Seed test data
 ```bash
 cd backend
 node seed.js
+# This creates sample voters and candidates in the MySQL voting_db
 ```
 
-### 5. Bootstrap Fabric network
-```bash
-# Install Fabric binaries first if not done:
-# curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.5.0 1.5.6
-
-cd network
-chmod +x network-setup.sh
-./network-setup.sh
-```
-
-### 6. Enroll admin and start backend
+### 5. Start backend
 ```bash
 cd backend
-node -e "require('./fabric/network').enrollAdmin().then(() => console.log('Done'))"
 npm start
 ```
 
@@ -161,31 +150,29 @@ python3 hardware/biometric.py
 
 ## Voting Flow
 
-```
-Pi captures fingerprint
-       ↓
-SHA-256 hash computed locally
-       ↓
-POST /api/auth/verify (voterID + hash + terminalID)
-       ↓
-MongoDB checks voter + duplicate prevention
-       ↓
-JWT token issued (15-min expiry)
-       ↓
-React ballot loads (constituency candidates from JWT)
-       ↓
-Voter selects candidate → Confirm screen
-       ↓
-POST /api/vote/cast → AES-256 encrypt vote
-       ↓
-Hyperledger Fabric chaincode castVote()
-  → On-chain duplicate check
-  → Vote stored in ledger
-  → CouchDB vote count incremented
-  → MongoDB voter.hasVoted = true
-       ↓
-Transaction ID returned to voter
-```
+  Pi captures fingerprint
+        ↓
+  Sensor outputs ASCII template → saved to /tmp/scan_fp.txt
+        ↓
+  POST /api/auth/verify  { voterID, fingerprintAscii, terminalID }
+        ↓
+  MySQL: fetch voter record by voterID
+        ↓
+  ASCII template similarity comparison (threshold: 85%)
+        ↓
+  If match → JWT issued (15-min expiry)
+        ↓
+  React ballot loads (constituency candidates from MySQL via JWT)
+        ↓
+  Voter selects candidate → Confirm screen
+        ↓
+  POST /api/vote/cast → AES-256 encrypt candidateID
+        ↓
+  Custom JS Blockchain: addBlock({ voterID, encryptedVote, candidateID, constituency })
+        ↓
+  MySQL: voters SET has_voted = 1
+        ↓
+  Block hash returned as Transaction ID
 
 ---
 

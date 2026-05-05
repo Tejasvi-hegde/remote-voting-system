@@ -1,17 +1,23 @@
 require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 
+const db = require('./db/mysql');
+const blockchain = require('./blockchain/chain');
+
 const authRoutes = require('./routes/auth');
 const voterRoutes = require('./routes/voter');
 const voteRoutes = require('./routes/vote');
 const dashboardRoutes = require('./routes/dashboard');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
+
+app.locals.db = db;
+app.locals.blockchain = blockchain;
 
 // ─── Security Middleware ───────────────────────────────────────────────────────
 app.use(helmet());
@@ -39,6 +45,7 @@ app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/voter', voterRoutes);
 app.use('/api/vote', voteRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -53,18 +60,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ─── Connect to MongoDB and Start ─────────────────────────────────────────────
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log('✅ MongoDB connected');
-    app.listen(process.env.PORT || 5000, () => {
-      console.log(`✅ Server running on port ${process.env.PORT || 5000}`);
-    });
-  })
-  .catch((err) => {
-    console.error('❌ MongoDB connection failed:', err.message);
-    process.exit(1);
-  });
+app.listen(process.env.PORT || 5000, () => {
+  console.log(`✅ Server running on port ${process.env.PORT || 5000}`);
+});
 
 module.exports = app;

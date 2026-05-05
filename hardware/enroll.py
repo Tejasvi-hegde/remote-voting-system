@@ -83,20 +83,27 @@ def capture_fingerprint_hash(sensor, sample_count=2):
     # Download the template bytes from the sensor
     characteristics = sensor.downloadCharacteristics(FINGERPRINT_CHARBUFFER1)
 
-    # Convert to bytes and compute SHA-256
-    template_bytes = bytes(characteristics)
-    sha256_hash = hashlib.sha256(template_bytes).hexdigest()
+    ascii_lines = ['FP_TEMPLATE_V1']
+    for i, val in enumerate(characteristics):
+        ascii_lines.append(f'byte_{i:04d}:{val:08b}')
+    template_str = '\n'.join(ascii_lines)
+    with open('/tmp/enroll_fp.txt', 'w') as fp_file:
+        fp_file.write(template_str)
+    
+    fingerprint_ascii = open('/tmp/enroll_fp.txt').read()
 
-    return sha256_hash, characteristics
+    return fingerprint_ascii, characteristics
 
 
-def register_voter(voter_id, name, biometric_hash, constituency):
+def register_voter(voter_id, name, dob, address, fingerprint_ascii, constituency):
     """Send voter registration data to the backend."""
     payload = {
         'voterID': voter_id,
         'name': name,
-        'biometricHash': biometric_hash,
-        'constituency': constituency
+        'dob': dob,
+        'address': address,
+        'constituency': constituency['name'],
+        'fingerprintAscii': fingerprint_ascii
     }
     try:
         response = requests.post(
@@ -115,6 +122,8 @@ def main():
     # Gather voter information
     voter_id = input('Enter Voter ID (e.g., ABC1234567): ').strip().upper()
     name = input('Enter Voter Full Name: ').strip()
+    dob = input('Enter DOB: ').strip()
+    address = input('Enter Address: ').strip()
     constituency_id = input('Enter Constituency ID (e.g., KA-001): ').strip()
     constituency_name = input('Enter Constituency Name: ').strip()
     state = input('Enter State: ').strip()
@@ -130,9 +139,9 @@ def main():
 
     # Capture fingerprint and get hash
     try:
-        biometric_hash, _ = capture_fingerprint_hash(sensor)
+        fingerprint_ascii, _ = capture_fingerprint_hash(sensor)
         print(f'\n✅ Fingerprint captured successfully.')
-        print(f'   Hash: {biometric_hash[:16]}...{biometric_hash[-8:]} (SHA-256)')
+        print(f'   ASCII saved to /tmp/enroll_fp.txt')
     except ValueError as e:
         print(f'\n❌ Capture failed: {e}')
         sys.exit(1)
@@ -149,8 +158,8 @@ def main():
         sys.exit(0)
 
     # Send to backend
-    result = register_voter(voter_id, name, biometric_hash, constituency)
-    if result.get('success'):
+    result = register_voter(voter_id, name, dob, address, fingerprint_ascii, constituency)
+    if result.get('message'):
         print(f'\n✅ Voter {voter_id} registered successfully!')
     else:
         print(f'\n❌ Registration failed: {result.get("error")}')
