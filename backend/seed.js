@@ -5,29 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 // Let's connect directly here to make seeding robust.
 const mysql = require('mysql2/promise');
 
-const FP_VOTER1 = `FP_TEMPLATE_V1
-ridge:00110011
-ridge:11001100
-minutiae:x=120,y=340,angle=45
-minutiae:x=200,y=180,angle=90
-minutiae:x=310,y=420,angle=135
-core:x=215,y=300`;
-
-const FP_VOTER2 = `FP_TEMPLATE_V1
-ridge:10101010
-ridge:01010101
-minutiae:x=100,y=200,angle=30
-minutiae:x=250,y=310,angle=60
-minutiae:x=180,y=400,angle=120
-core:x=190,y=280`;
-
-const FP_VOTER3 = `FP_TEMPLATE_V1
-ridge:11110000
-ridge:00001111
-minutiae:x=140,y=360,angle=15
-minutiae:x=290,y=190,angle=75
-minutiae:x=330,y=440,angle=150
-core:x=230,y=310`;
+// Dummy FP data removed because we are seeding existing voters without biometrics.
 
 async function seed() {
   const host = process.env.MYSQL_HOST || 'localhost';
@@ -54,11 +32,26 @@ async function seed() {
       dob VARCHAR(255),
       address VARCHAR(255),
       constituency VARCHAR(255) NOT NULL,
-      fingerprint_template TEXT NOT NULL,
+      fingerprint_template VARCHAR(255) NULL,
       has_voted INT DEFAULT 0,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  const [voterColumns] = await connection.query(`
+    SELECT COLUMN_NAME
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'voters'
+  `, [database]);
+
+  const voterColumnNames = new Set(voterColumns.map((column) => column.COLUMN_NAME));
+  if (voterColumnNames.has('fingerprint_id') && !voterColumnNames.has('fingerprint_template')) {
+    await connection.query(`ALTER TABLE voters CHANGE COLUMN fingerprint_id fingerprint_template VARCHAR(255)`);
+  } else if (!voterColumnNames.has('fingerprint_template')) {
+    await connection.query(`ALTER TABLE voters ADD COLUMN fingerprint_template VARCHAR(255) AFTER constituency`);
+  }
+
+  await connection.query(`ALTER TABLE voters MODIFY COLUMN fingerprint_template VARCHAR(255) NULL`);
 
   await connection.query(`
     CREATE TABLE IF NOT EXISTS candidates (
@@ -78,24 +71,66 @@ async function seed() {
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `;
 
-  await connection.query(insertVoter, [uuidv4(), 'VTR001', 'Ravi Kumar', '1990-05-12', '12 MG Road, Bengaluru', 'Bengaluru South', FP_VOTER1]);
-  await connection.query(insertVoter, [uuidv4(), 'VTR002', 'Priya Sharma', '1988-11-23', '45 Indiranagar, Bengaluru', 'Bengaluru North', FP_VOTER2]);
-  await connection.query(insertVoter, [uuidv4(), 'VTR003', 'Mohan Das', '1975-03-08', '78 Jayanagar, Bengaluru', 'Bengaluru South', FP_VOTER3]);
+  // Generate 50 dummy existing voters
+  const constituencies = ['Bengaluru South', 'Bengaluru North', 'Bengaluru Central', 'Mysuru'];
+  const firstNames = ['Amit', 'Priya', 'Ravi', 'Sunita', 'Mohan', 'Kiran', 'Meena', 'Rahul', 'Sneha', 'Vikram'];
+  const lastNames = ['Sharma', 'Kumar', 'Das', 'Bhat', 'Rao', 'Patil', 'Reddy', 'Gowda', 'Singh', 'Jain'];
+  
+  for (let i = 1; i <= 50; i++) {
+    const vId = `VTR${String(i).padStart(3, '0')}`;
+    const name = `${firstNames[i % firstNames.length]} ${lastNames[i % lastNames.length]}`;
+    const year = 1960 + (i % 40);
+    const month = String((i % 12) + 1).padStart(2, '0');
+    const day = String((i % 28) + 1).padStart(2, '0');
+    const dob = `${year}-${month}-${day}`;
+    const address = `${i * 10} Main Road, Block ${i % 5}`;
+    const constituency = constituencies[i % constituencies.length];
+    
+    await connection.query(insertVoter, [uuidv4(), vId, name, dob, address, constituency, null]);
+  }
 
   const insertCandidate = `
     INSERT INTO candidates (id, name, party, symbol, constituency)
     VALUES (?, ?, ?, ?, ?)
   `;
 
-  const c1 = uuidv4(), c2 = uuidv4(), c3 = uuidv4(), c4 = uuidv4();
-  await connection.query(insertCandidate, [c1, 'Anand Raj', 'Party A', 'Lotus', 'Bengaluru South']);
-  await connection.query(insertCandidate, [c2, 'Sunita Devi', 'Party B', 'Hand', 'Bengaluru South']);
-  await connection.query(insertCandidate, [c3, 'Kiran Bhat', 'Party C', 'Bicycle', 'Bengaluru North']);
-  await connection.query(insertCandidate, [c4, 'Meena Rao', 'Party A', 'Lotus', 'Bengaluru North']);
+  const extraCandidates = [
+    // Bengaluru South
+    ['Anand Raj', 'Party A', 'Lotus', 'Bengaluru South'],
+    ['Sunita Devi', 'Party B', 'Hand', 'Bengaluru South'],
+    ['Rakesh Sharma', 'Party C', 'Bicycle', 'Bengaluru South'],
+    ['Vidya Balan', 'Party D', 'Elephant', 'Bengaluru South'],
+    ['Rahul Dravid', 'Independent', 'Bat', 'Bengaluru South'],
+    
+    // Bengaluru North
+    ['Kiran Bhat', 'Party A', 'Lotus', 'Bengaluru North'],
+    ['Meena Rao', 'Party B', 'Hand', 'Bengaluru North'],
+    ['Chetan Kumar', 'Party C', 'Bicycle', 'Bengaluru North'],
+    ['Akshata Murthy', 'Party D', 'Elephant', 'Bengaluru North'],
+    ['Srinivas Gowda', 'Independent', 'Bat', 'Bengaluru North'],
+
+    // Bengaluru Central
+    ['Ramesh Kumar', 'Party A', 'Lotus', 'Bengaluru Central'],
+    ['Pooja Hegde', 'Party B', 'Hand', 'Bengaluru Central'],
+    ['Arun Vijay', 'Party C', 'Bicycle', 'Bengaluru Central'],
+    ['Shruthi Hassan', 'Party D', 'Elephant', 'Bengaluru Central'],
+    ['Prakash Raj', 'Independent', 'Bat', 'Bengaluru Central'],
+
+    // Mysuru
+    ['Siddaramaiah', 'Party A', 'Lotus', 'Mysuru'],
+    ['Pratap Simha', 'Party B', 'Hand', 'Mysuru'],
+    ['Darshan Toogudeepa', 'Party C', 'Bicycle', 'Mysuru'],
+    ['Rashmika Mandanna', 'Party D', 'Elephant', 'Mysuru'],
+    ['Yash', 'Independent', 'Bat', 'Mysuru'],
+  ];
+
+  for (const c of extraCandidates) {
+    await connection.query(insertCandidate, [uuidv4(), c[0], c[1], c[2], c[3]]);
+  }
 
   console.log('✅ MySQL database seeded successfully.');
-  console.log('   Voters: VTR001, VTR002, VTR003');
-  console.log('   Candidates seeded for Bengaluru South and Bengaluru North');
+  console.log('   50 dummy voters created without fingerprints.');
+  console.log('   Candidates seeded.');
   await connection.end();
 }
 

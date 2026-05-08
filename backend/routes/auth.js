@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
-const { isMatch } = require('../utils/fingerprintMatch');
 const { generateAuthenticationOptions, verifyAuthenticationResponse } = require('@simplewebauthn/server');
 
 const rpID = 'localhost';
@@ -11,12 +10,12 @@ const origin = 'http://localhost:3000';
 const authenticationChallenges = {};
 
 // POST /api/auth/register
-// Body: { voterID, name, dob, address, constituency, fingerprintAscii }
+// Body: { voterID, name, dob, address, constituency, fingerprintId }
 router.post('/register', async (req, res) => {
   const db = req.app.locals.db;
-  const { voterID, name, dob, address, constituency, fingerprintAscii } = req.body;
+  const { voterID, name, dob, address, constituency, fingerprintId } = req.body;
 
-  if (!voterID || !name || !constituency || !fingerprintAscii) {
+  if (!voterID || !name || !constituency || !fingerprintId) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
@@ -29,7 +28,7 @@ router.post('/register', async (req, res) => {
     await db.query(`
       INSERT INTO voters (id, voter_id, name, dob, address, constituency, fingerprint_template)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `, [uuidv4(), voterID, name, dob || '', address || '', constituency, fingerprintAscii]);
+    `, [uuidv4(), voterID, name, dob || '', address || '', constituency, String(fingerprintId)]);
 
     return res.status(201).json({ message: 'Voter registered successfully' });
   } catch (err) {
@@ -38,18 +37,18 @@ router.post('/register', async (req, res) => {
 });
 
 // POST /api/auth/verify
-// Body: { voterID, fingerprintAscii, terminalID }
-// fingerprintAscii = raw ASCII string content from fingerprint sensor .txt output file
+// Body: { fingerprintId, terminalID }
+// fingerprintId = the integer pageID from the hardware sensor
 router.post('/verify', async (req, res) => {
   const db = req.app.locals.db;
-  const { voterID, fingerprintAscii, terminalID } = req.body;
+  const { fingerprintId, terminalID } = req.body;
 
-  if (!voterID || !fingerprintAscii) {
-    return res.status(400).json({ error: 'voterID and fingerprintAscii are required' });
+  if (!fingerprintId) {
+    return res.status(400).json({ error: 'fingerprintId is required' });
   }
 
   try {
-    const [voters] = await db.query('SELECT * FROM voters WHERE voter_id = ?', [voterID]);
+    const [voters] = await db.query('SELECT * FROM voters WHERE fingerprint_template = ?', [String(fingerprintId)]);
     if (voters.length === 0) {
       return res.status(404).json({ error: 'Voter not found' });
     }
@@ -57,11 +56,6 @@ router.post('/verify', async (req, res) => {
 
     if (voter.has_voted === 1) {
       return res.status(403).json({ error: 'Voter has already voted' });
-    }
-
-    const matched = isMatch(fingerprintAscii, voter.fingerprint_template);
-    if (!matched) {
-      return res.status(401).json({ error: 'Fingerprint does not match' });
     }
 
     const token = jwt.sign(

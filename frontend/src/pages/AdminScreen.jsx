@@ -9,8 +9,10 @@ export default function AdminScreen() {
   const [candidates, setCandidates] = useState([]);
   const [activeTab, setActiveTab] = useState('voters');
   const [message, setMessage] = useState('');
+  const [piUrl, setPiUrl] = useState('http://192.168.1.100:5000');
 
-  const [voterForm, setVoterForm] = useState({ voterID: '', name: '', dob: '', address: '', constituency: '' });
+  const [lookupVoterID, setLookupVoterID] = useState('');
+  const [foundVoter, setFoundVoter] = useState(null);
   const [candidateForm, setCandidateForm] = useState({ name: '', party: '', symbol: '', constituency: '' });
 
   useEffect(() => {
@@ -36,26 +38,52 @@ export default function AdminScreen() {
     }
   };
 
-  const handleVoterSubmit = async (e) => {
+  const handleLookup = async (e) => {
     e.preventDefault();
-    setMessage('Simulating hardware fingerprint scanner capture...');
-    
-    // Simulate R307 fingerprint sensor ASCII output
-    const simulatedAscii = `FP_TEMPLATE_V1\nridge:00110011\nridge:11001100\nminutiae:x=120,y=340,angle=45\nminutiae:x=200,y=180,angle=90\nminutiae:x=310,y=420,angle=135\ncore:x=215,y=300\nvoter:${voterForm.voterID}`;
-
+    setMessage('Looking up voter...');
+    setFoundVoter(null);
     try {
-      await new Promise(r => setTimeout(r, 1000)); // artificial delay for UX
-
-      await axios.post(`${API_BASE}/voter`, {
-        ...voterForm,
-        fingerprintAscii: simulatedAscii
-      });
-
-      setMessage('Voter added successfully! Fingerprint template simulated and saved.');
-      setVoterForm({ voterID: '', name: '', dob: '', address: '', constituency: '' });
-      fetchVoters();
+      const res = await axios.get(`${API_BASE}/voter/lookup/${lookupVoterID}`);
+      setFoundVoter(res.data);
+      setMessage('Voter found! Verify details below.');
     } catch (err) {
       setMessage(`Error: ${err.response?.data?.error || err.message}`);
+    }
+  };
+
+  const handleVoterSubmit = async (e) => {
+    e.preventDefault();
+    if (!foundVoter) return;
+
+    setMessage('Simulating hardware fingerprint scanner (generating unique ID 1-1000)...');
+    
+    try {
+      // Simulate hardware delay
+      await new Promise(r => setTimeout(r, 2000));
+      
+      const fingerprintId = Math.floor(Math.random() * 1000) + 1;
+      
+      if (!fingerprintId) {
+         throw new Error('Simulation failed to generate a valid fingerprintId');
+      }
+
+      setMessage(`Simulated fingerprint scanned (ID: ${fingerprintId}). Linking to voter...`);
+
+      await axios.post(`${API_BASE}/voter/register-migrant`, {
+        voterID: foundVoter.voter_id,
+        fingerprintId: fingerprintId
+      });
+
+      setMessage(`Migrant voter registered successfully! Fingerprint linked at ID: ${fingerprintId}`);
+      setFoundVoter(null);
+      setLookupVoterID('');
+      fetchVoters();
+    } catch (err) {
+      if (err.code === 'ECONNABORTED' || err.message === 'Network Error') {
+        setMessage(`Error: Could not reach Raspberry Pi at ${piUrl}. Is the Python server running?`);
+      } else {
+        setMessage(`Error: ${err.response?.data?.error || err.message}`);
+      }
     }
   };
 
@@ -86,16 +114,41 @@ export default function AdminScreen() {
 
       <div className="admin-content">
         {activeTab === 'voters' && (
-          <div className="admin-section">
-            <h2>Add New Voter (Simulated R307 Fingerprint)</h2>
-            <form onSubmit={handleVoterSubmit} className="admin-form">
-              <input placeholder="Voter ID (e.g. VTR099)" value={voterForm.voterID} onChange={e => setVoterForm({...voterForm, voterID: e.target.value})} required />
-              <input placeholder="Full Name" value={voterForm.name} onChange={e => setVoterForm({...voterForm, name: e.target.value})} required />
-              <input placeholder="DOB (YYYY-MM-DD)" type="date" value={voterForm.dob} onChange={e => setVoterForm({...voterForm, dob: e.target.value})} />
-              <input placeholder="Address" value={voterForm.address} onChange={e => setVoterForm({...voterForm, address: e.target.value})} />
-              <input placeholder="Constituency" value={voterForm.constituency} onChange={e => setVoterForm({...voterForm, constituency: e.target.value})} required />
-              <button type="submit" style={{ backgroundColor: '#28a745' }}>Simulate Fingerprint Scan & Save</button>
+          <div className="admin-section fade-in">
+            <div className="pi-config">
+              <h3>Hardware Configuration (Simulated)</h3>
+              <p>Hardware biometric scanner is currently bypassed. A unique fingerprint ID (1-1000) will be simulated automatically.</p>
+            </div>
+
+            <h2>Register Migrant Voter</h2>
+            <p className="section-desc">Look up an existing voter in the national database to register their biometrics for remote voting.</p>
+            <form onSubmit={handleLookup} className="admin-form lookup-form">
+              <input 
+                placeholder="Enter Voter ID (e.g. VTR001)" 
+                value={lookupVoterID} 
+                onChange={e => setLookupVoterID(e.target.value)} 
+                required 
+              />
+              <button type="submit">Lookup Voter</button>
             </form>
+
+            {foundVoter && (
+              <div className="voter-preview">
+                <h3>Voter Details Verified</h3>
+                <div className="voter-preview-details">
+                  <p><strong>Name:</strong> {foundVoter.name}</p>
+                  <p><strong>DOB:</strong> {foundVoter.dob}</p>
+                  <p><strong>Address:</strong> {foundVoter.address}</p>
+                  <p><strong>Constituency:</strong> {foundVoter.constituency}</p>
+                  <p><strong>Status:</strong> {foundVoter.fingerprint_template ? 'Already registered for biometrics' : 'No biometrics linked yet'}</p>
+                </div>
+                <form onSubmit={handleVoterSubmit} className="register-form">
+                  <button type="submit" className="btn-success">
+                    Trigger Hardware Scanner & Register as Migrant
+                  </button>
+                </form>
+              </div>
+            )}
 
             <h2>Registered Voters ({voters.length})</h2>
             <table className="admin-table">

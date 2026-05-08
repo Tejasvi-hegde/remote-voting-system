@@ -60,7 +60,7 @@ function Dashboard() {
     setTxResult(null);
     try {
       const { data } = await verifyTransaction(txID.trim());
-      setTxResult(data.transaction);
+      setTxResult(data);
     } catch {
       setTxError('Transaction not found on blockchain.');
     }
@@ -190,10 +190,11 @@ function Dashboard() {
             <p>✅ Transaction verified on blockchain</p>
             <table className="tx-table">
               <tbody>
-                <tr><td>Transaction ID</td><td>{txResult.transactionID}</td></tr>
-                <tr><td>Constituency</td><td>{txResult.constituencyID}</td></tr>
+                <tr><td>Transaction ID (Hash)</td><td>{txResult.hash}</td></tr>
+                <tr><td>Block Index</td><td>{txResult.blockIndex}</td></tr>
                 <tr><td>Timestamp</td><td>{new Date(txResult.timestamp).toLocaleString()}</td></tr>
-                <tr><td>Status</td><td>{txResult.status}</td></tr>
+                <tr><td>Constituency</td><td>{txResult.constituency || 'N/A'}</td></tr>
+                <tr><td>Status</td><td style={{ color: '#16a34a' }}>VERIFIED / SECURE</td></tr>
               </tbody>
             </table>
           </div>

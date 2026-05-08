@@ -10,13 +10,13 @@ import axios from 'axios';
  */
 function AuthScreen() {
   const navigate = useNavigate();
-  const [voterID, setVoterID] = useState('');
+  const [fingerprintId, setFingerprintId] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   // If already authenticated
   const [voter, setVoter] = useState(null);
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(9);
 
   useEffect(() => {
     const token = sessionStorage.getItem('voting_token');
@@ -35,7 +35,7 @@ function AuthScreen() {
         expiresAt: new Date(payload.exp * 1000)
       });
 
-      let count = 5;
+      let count = 9;
       const timer = setInterval(() => {
         count -= 1;
         setCountdown(count);
@@ -52,26 +52,16 @@ function AuthScreen() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!voterID) return setError('Please enter your Voter ID first.');
+    if (!fingerprintId) return setError('Please enter a Simulated Fingerprint ID first.');
 
     setError('');
     setLoading(true);
-
-    // Simulate the hardware fingerprint ASCII string based on entered ID
-    let simulatedAscii = `FP_TEMPLATE_V1\nridge:00110011\nridge:11001100\nminutiae:x=120,y=340,angle=45\nminutiae:x=200,y=180,angle=90\nminutiae:x=310,y=420,angle=135\ncore:x=215,y=300\nvoter:${voterID}`;
-    
-    if (voterID === 'VTR002') {
-      simulatedAscii = `FP_TEMPLATE_V1\nridge:10101010\nridge:01010101\nminutiae:x=100,y=200,angle=30\nminutiae:x=250,y=310,angle=60\nminutiae:x=180,y=400,angle=120\ncore:x=190,y=280`;
-    } else if (voterID === 'VTR003') {
-      simulatedAscii = `FP_TEMPLATE_V1\nridge:11110000\nridge:00001111\nminutiae:x=140,y=360,angle=15\nminutiae:x=290,y=190,angle=75\nminutiae:x=330,y=440,angle=150\ncore:x=230,y=310`;
-    }
 
     try {
       await new Promise(r => setTimeout(r, 1000)); // Ux delay for realistic feel
 
       const { data: verifyResult } = await axios.post('http://localhost:5001/api/auth/verify', {
-        voterID,
-        fingerprintAscii: simulatedAscii,
+        fingerprintId,
         terminalID: 'RVC-1'
       });
 
@@ -95,26 +85,25 @@ function AuthScreen() {
           </div>
         </div>
 
-        <div className="voter-card" style={{ padding: '2rem', textAlign: 'center' }}>
+        <div className="voter-card auth-card">
           <h3>Welcome, Voter!</h3>
-          <p>Please enter your Voter ID to simulate scanning your fingerprint.</p>
+          <p>Please enter your Simulated Fingerprint ID.</p>
 
-          <form onSubmit={handleLogin} style={{ marginTop: '1.5rem' }}>
+          <form onSubmit={handleLogin} className="auth-form">
             <input
-              type="text"
-              placeholder="Enter Voter ID (e.g. VTR099)"
-              value={voterID}
-              onChange={e => setVoterID(e.target.value.toUpperCase())}
-              style={{ padding: '10px', fontSize: '1rem', width: '80%', marginBottom: '1rem', borderRadius: '4px', border: '1px solid #ccc' }}
+              type="number"
+              className="auth-input"
+              placeholder="Enter Fingerprint ID (e.g. 15)"
+              value={fingerprintId}
+              onChange={e => setFingerprintId(e.target.value)}
             />
-            <br />
-            <button className="btn-primary" type="submit" disabled={loading} style={{ padding: '10px 20px', fontSize: '1.1rem' }}>
-              {loading ? 'Scanning...' : 'Simulate Hardware Fingerprint Scan '}
+            <button className="btn-primary auth-btn" type="submit" disabled={loading}>
+              {loading ? 'Scanning...' : 'Simulate Hardware Fingerprint Scan'}
             </button>
           </form>
 
           {error && (
-            <div className="error-box" style={{ marginTop: '1rem' }}>
+            <div className="error-box">
               <p>{error}</p>
             </div>
           )}

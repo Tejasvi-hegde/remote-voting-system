@@ -12,7 +12,7 @@ services:
   # ── Node.js Backend ───────────────────────────────────────────────────────
   backend:
     build:
-      context: ./backend
+      context: ../backend
       dockerfile: Dockerfile
     container_name: voting-backend
     restart: unless-stopped
@@ -37,7 +37,7 @@ services:
   # ── React Frontend ────────────────────────────────────────────────────────
   frontend:
     build:
-      context: ./frontend
+      context: ../frontend
       dockerfile: Dockerfile
     container_name: voting-frontend
     restart: unless-stopped

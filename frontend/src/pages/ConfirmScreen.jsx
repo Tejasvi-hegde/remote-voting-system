@@ -30,8 +30,7 @@ function ConfirmScreen() {
     setError('');
     try {
       const { data } = await castVote(candidate.candidateID);
-      // Clear session — vote is done
-      sessionStorage.clear();
+      // Do not remove candidate or clear session yet, so the screen doesn't redirect
       setResult(data);
     } catch (err) {
       const msg = err.response?.data?.error || 'Vote submission failed. Please call the presiding officer.';
@@ -44,25 +43,28 @@ function ConfirmScreen() {
   if (result) {
     return (
       <div className="screen success-screen">
-        <div className="success-icon">✅</div>
-        <h1>Vote Cast Successfully!</h1>
-        <p className="success-message">
-          Your vote was successfully casted to <strong>{candidate.name}</strong>.<br />
+        <div className="success-icon" style={{ fontSize: '4rem', marginBottom: '1rem' }}>✅</div>
+        <h2>Vote Cast Successfully!</h2>
+        <p className="success-message" style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>
+          Your vote was successfully casted for <strong>{candidate.name}</strong>.<br />
           It has been securely recorded on the blockchain.
         </p>
 
-        <div className="tx-card">
-          <p className="tx-label">Transaction ID (keep this for verification)</p>
-          <p className="tx-id">{result.transactionID}</p>
-          <p className="tx-time">Recorded at: {new Date(result.timestamp).toLocaleString()}</p>
+        <div className="tx-card" style={{ background: '#f8f9fa', padding: '1.5rem', borderRadius: '8px', border: '1px solid #ccc' }}>
+          <p className="tx-label" style={{ color: '#6c757d', fontWeight: 'bold' }}>Transaction ID (keep this for verification)</p>
+          <p className="tx-id" style={{ fontSize: '1.1rem', wordBreak: 'break-all', fontFamily: 'monospace', color: '#0056b3' }}>{result.transactionID}</p>
+          <p className="tx-time" style={{ color: '#6c757d', marginTop: '0.5rem' }}>Recorded at: {new Date(result.timestamp).toLocaleString()}</p>
         </div>
 
-        <p className="thank-you">
+        <p className="thank-you" style={{ marginTop: '2rem', fontSize: '1.2rem', fontWeight: 'bold', color: '#28a745' }}>
           🙏 Thank you for exercising your democratic right. <br />
           This terminal will reset in a moment.
         </p>
 
-        <AutoResetTimer seconds={20} onDone={() => window.location.href = '/'} />
+        <AutoResetTimer seconds={20} onDone={() => {
+          sessionStorage.clear();
+          window.location.href = '/';
+        }} />
       </div>
     );
   }

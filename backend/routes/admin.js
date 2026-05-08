@@ -32,24 +32,42 @@ router.get('/candidates', async (req, res) => {
   }
 });
 
-
-
-// POST /api/admin/voter
-router.post('/voter', async (req, res) => {
+// GET /api/admin/voter/lookup/:voterID
+router.get('/voter/lookup/:voterID', async (req, res) => {
   const db = req.app.locals.db;
-  const { voterID, name, dob, address, constituency, fingerprintAscii } = req.body;
+  const { voterID } = req.params;
 
-  if (!voterID || !name || !constituency || !fingerprintAscii) {
-    return res.status(400).json({ error: 'Missing required fields or fingerprint' });
+  try {
+    const [voters] = await db.query('SELECT voter_id, name, dob, address, constituency, fingerprint_template FROM voters WHERE voter_id = ?', [voterID]);
+    if (voters.length === 0) {
+      return res.status(404).json({ error: 'Voter not found in national database' });
+    }
+    res.json(voters[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+// POST /api/admin/voter/register-migrant
+router.post('/voter/register-migrant', async (req, res) => {
+  const db = req.app.locals.db;
+  const { voterID, fingerprintId } = req.body;
+
+  if (!voterID || !fingerprintId) {
+    return res.status(400).json({ error: 'Missing voterID or fingerprint ID' });
   }
 
   try {
-    await db.query(`
-      INSERT INTO voters (id, voter_id, name, dob, address, constituency, fingerprint_template)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `, [uuidv4(), voterID, name, dob || '', address || '', constituency, fingerprintAscii]);
+    const [result] = await db.query(`
+      UPDATE voters 
+      SET fingerprint_template = ? 
+      WHERE voter_id = ?
+    `, [String(fingerprintId), voterID]);
     
-    res.json({ message: 'Voter added successfully with fingerprint' });
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Voter not found' });
+    }
+
+    res.json({ message: 'Voter successfully registered as migrant (fingerprint linked)' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

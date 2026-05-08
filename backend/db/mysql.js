@@ -2,7 +2,7 @@ const mysql = require('mysql2/promise');
 
 const host = process.env.MYSQL_HOST || 'localhost';
 const user = process.env.MYSQL_USER || 'root';
-const password = process.env.MYSQL_PASSWORD || 'Mysql@9876';
+const password = process.env.MYSQL_PASSWORD || 'Tyagli@2005';
 const database = process.env.MYSQL_DB || 'voting_db';
 
 const pool = mysql.createPool({
@@ -29,11 +29,26 @@ async function initDB() {
         dob VARCHAR(255),
         address VARCHAR(255),
         constituency VARCHAR(255) NOT NULL,
-        fingerprint_template TEXT NOT NULL,
+        fingerprint_template VARCHAR(255) NULL,
         has_voted INT DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    const [voterColumns] = await pool.query(`
+      SELECT COLUMN_NAME
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'voters'
+    `, [database]);
+
+    const voterColumnNames = new Set(voterColumns.map((column) => column.COLUMN_NAME));
+    if (voterColumnNames.has('fingerprint_id') && !voterColumnNames.has('fingerprint_template')) {
+      await pool.query(`ALTER TABLE voters CHANGE COLUMN fingerprint_id fingerprint_template VARCHAR(255)`);
+    } else if (!voterColumnNames.has('fingerprint_template')) {
+      await pool.query(`ALTER TABLE voters ADD COLUMN fingerprint_template VARCHAR(255) AFTER constituency`);
+    }
+
+    await pool.query(`ALTER TABLE voters MODIFY COLUMN fingerprint_template VARCHAR(255) NULL`);
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS candidates (
