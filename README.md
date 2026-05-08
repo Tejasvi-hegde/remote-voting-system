@@ -126,7 +126,7 @@ pip3 install -r hardware/requirements.txt
 python3 hardware/enroll.py
 
 # Start voting terminal
-export BACKEND_URL=http://YOUR_SERVER_IP:5000
+export BACKEND_URL=http://YOUR_SERVER_IP:5001
 export FRONTEND_URL=http://YOUR_SERVER_IP:3000
 export TERMINAL_ID=RVC-1
 python3 hardware/biometric.py

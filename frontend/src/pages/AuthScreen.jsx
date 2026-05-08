@@ -13,7 +13,7 @@ function AuthScreen() {
   const [voterID, setVoterID] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   // If already authenticated
   const [voter, setVoter] = useState(null);
   const [countdown, setCountdown] = useState(5);
@@ -29,9 +29,9 @@ function AuthScreen() {
         return;
       }
       setVoter({
-        name: payload.name, 
+        name: payload.name,
         voterID: payload.voterID,
-        constituency: payload.constituency, 
+        constituency: payload.constituency,
         expiresAt: new Date(payload.exp * 1000)
       });
 
@@ -53,12 +53,18 @@ function AuthScreen() {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!voterID) return setError('Please enter your Voter ID first.');
-    
+
     setError('');
     setLoading(true);
 
-    // Simulate the hardware fingerprint ASCII string
-    const simulatedAscii = `FP_TEMPLATE_V1\nridge:00110011\nridge:11001100\nminutiae:x=120,y=340,angle=45\nminutiae:x=200,y=180,angle=90\nminutiae:x=310,y=420,angle=135\ncore:x=215,y=300\nvoter:${voterID}`;
+    // Simulate the hardware fingerprint ASCII string based on entered ID
+    let simulatedAscii = `FP_TEMPLATE_V1\nridge:00110011\nridge:11001100\nminutiae:x=120,y=340,angle=45\nminutiae:x=200,y=180,angle=90\nminutiae:x=310,y=420,angle=135\ncore:x=215,y=300\nvoter:${voterID}`;
+    
+    if (voterID === 'VTR002') {
+      simulatedAscii = `FP_TEMPLATE_V1\nridge:10101010\nridge:01010101\nminutiae:x=100,y=200,angle=30\nminutiae:x=250,y=310,angle=60\nminutiae:x=180,y=400,angle=120\ncore:x=190,y=280`;
+    } else if (voterID === 'VTR003') {
+      simulatedAscii = `FP_TEMPLATE_V1\nridge:11110000\nridge:00001111\nminutiae:x=140,y=360,angle=15\nminutiae:x=290,y=190,angle=75\nminutiae:x=330,y=440,angle=150\ncore:x=230,y=310`;
+    }
 
     try {
       await new Promise(r => setTimeout(r, 1000)); // Ux delay for realistic feel
@@ -92,18 +98,18 @@ function AuthScreen() {
         <div className="voter-card" style={{ padding: '2rem', textAlign: 'center' }}>
           <h3>Welcome, Voter!</h3>
           <p>Please enter your Voter ID to simulate scanning your fingerprint.</p>
-          
+
           <form onSubmit={handleLogin} style={{ marginTop: '1.5rem' }}>
-            <input 
-              type="text" 
-              placeholder="Enter Voter ID (e.g. VTR099)" 
-              value={voterID} 
+            <input
+              type="text"
+              placeholder="Enter Voter ID (e.g. VTR099)"
+              value={voterID}
               onChange={e => setVoterID(e.target.value.toUpperCase())}
               style={{ padding: '10px', fontSize: '1rem', width: '80%', marginBottom: '1rem', borderRadius: '4px', border: '1px solid #ccc' }}
             />
             <br />
             <button className="btn-primary" type="submit" disabled={loading} style={{ padding: '10px 20px', fontSize: '1.1rem' }}>
-              {loading ? 'Scanning...' : 'Simulate Hardware Fingerprint Scan 👆'}
+              {loading ? 'Scanning...' : 'Simulate Hardware Fingerprint Scan '}
             </button>
           </form>
 

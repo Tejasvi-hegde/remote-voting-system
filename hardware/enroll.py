@@ -20,7 +20,7 @@ from pyfingerprint.pyfingerprint import PyFingerprint, FINGERPRINT_CHARBUFFER1, 
 # ── Config ────────────────────────────────────────────────────────────────────
 UART_PORT = '/dev/ttyS0'
 BAUD_RATE = 57600
-BACKEND_URL = 'http://192.168.1.100:5000'   # Change to your server IP
+BACKEND_URL = 'http://192.168.1.100:5001'   # Change to your server IP
 
 
 def connect_sensor():

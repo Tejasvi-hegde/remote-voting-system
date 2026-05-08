@@ -47,7 +47,8 @@ function ConfirmScreen() {
         <div className="success-icon">✅</div>
         <h1>Vote Cast Successfully!</h1>
         <p className="success-message">
-          Your vote has been securely recorded on the blockchain.
+          Your vote was successfully casted to <strong>{candidate.name}</strong>.<br />
+          It has been securely recorded on the blockchain.
         </p>
 
         <div className="tx-card">

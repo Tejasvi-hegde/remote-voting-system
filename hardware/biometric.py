@@ -34,7 +34,7 @@ from pyfingerprint.pyfingerprint import PyFingerprint, FINGERPRINT_CHARBUFFER1
 # ── Config ────────────────────────────────────────────────────────────────────
 UART_PORT = '/dev/ttyS0'
 BAUD_RATE = 57600
-BACKEND_URL = os.environ.get('BACKEND_URL', 'http://192.168.1.100:5000')
+BACKEND_URL = os.environ.get('BACKEND_URL', 'http://192.168.1.100:5001')
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://192.168.1.100:3000')
 TERMINAL_ID = os.environ.get('TERMINAL_ID', 'RVC-1')
 LOCAL_DB_PATH = '/var/lib/voting/local_buffer.db'

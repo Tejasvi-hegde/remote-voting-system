@@ -17,10 +17,10 @@ services:
     container_name: voting-backend
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "5001:5001"
     environment:
       NODE_ENV: production
-      PORT: 5000
+      PORT: 5001
       JWT_SECRET: ${JWT_SECRET:-change_this_secret_in_production}
       VOTE_ENCRYPTION_KEY: ${VOTE_ENCRYPTION_KEY:-12345678901234567890123456789012}
       FRONTEND_URL: http://localhost:3000
