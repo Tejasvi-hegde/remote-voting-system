@@ -265,11 +265,15 @@ body {
   width: 100%;
 }
 
-.confirm-actions { display: flex; gap: 1.5rem; width: 100%; margin-top: 1rem; }
+.confirm-actions { display: flex; gap: 1.5rem; width: 100%; margin-top: 1.5rem; }
 .confirm-actions > button {
-  padding: 16px 24px; font-size: 1.1rem;
+  flex: 1 !important;
+  width: auto !important;
+  padding: 16px 24px;
+  font-size: 1.1rem;
+  font-weight: 700;
 }
-.btn-confirm { flex: 2 !important; background: #16a34a !important; box-shadow: 0 4px 15px -3px rgba(22, 163, 74, 0.3) !important; }
+.btn-confirm { background: #16a34a !important; box-shadow: 0 4px 15px -3px rgba(22, 163, 74, 0.3) !important; }
 .btn-confirm:hover { background: #15803d !important; }
 
 /* ── Success Screen ──────────────────────────────────────────────────────── */
@@ -466,3 +470,231 @@ body {
 .tx-table td { padding: 5px 0; border-bottom: 1px solid #dcfce7; color: #475569; }
 .tx-table td:last-child { color: #0f172a; text-align: right; font-family: 'Courier New', monospace; }
 .tx-table tr:last-child td { border-bottom: none; }
+
+/* ── Language Switcher ── */
+.lang-switcher {
+  margin-left: auto;
+}
+.lang-select {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #0f172a;
+  cursor: pointer;
+  outline: none;
+  font-weight: 600;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.lang-select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+/* ── Light-Theme Utility Dashboard Styles ── */
+.dashboard-light {
+  background: #f8fafc;
+  color: #0f172a;
+}
+.light-panel {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+.light-tab-bar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+}
+.light-tab-btn {
+  padding: 0.8rem 1.5rem;
+  background: transparent;
+  color: #64748b;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+}
+.light-tab-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+.light-tab-btn.active {
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
+}
+.light-console {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 1rem;
+  border-radius: 8px;
+  height: 200px;
+  overflow-y: auto;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+  color: #1e293b;
+  border-left: 4px solid #2563eb;
+  white-space: pre-wrap;
+}
+.light-card-interactive {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 0.8rem;
+}
+.light-card-inactive {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+}
+.light-card-inactive:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+.light-card-active {
+  background: #eff6ff;
+  border: 2px solid #3b82f6;
+  color: #1e40af;
+  font-weight: 600;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.08);
+}
+.blockchain-block-light {
+  min-width: 300px;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+.blockchain-block-light:hover {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* ── EVM Ballot Styling ── */
+.candidate-card.evm-row {
+  display: grid;
+  grid-template-columns: 50px 1.5fr 80px 150px;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  margin-bottom: 0.5rem;
+  width: 100%;
+}
+.candidate-card.evm-row::before {
+  display: none;
+}
+.candidate-card.evm-row:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+  transform: none;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.04);
+}
+.candidate-card.evm-row.selected {
+  border-color: #2563eb;
+  background: #f0f7ff;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+}
+.evm-serial {
+  font-family: monospace;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #64748b;
+  text-align: center;
+  border-right: 2px solid #e2e8f0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.candidate-card.evm-row.selected .evm-serial {
+  color: #2563eb;
+  border-right-color: #bfdbfe;
+}
+.evm-symbol-box {
+  width: 60px;
+  height: 60px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+}
+.candidate-card.evm-row.selected .evm-symbol-box {
+  background: #ffffff;
+  border-color: #bfdbfe;
+}
+.evm-panel {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1.5rem;
+  border-left: 2px solid #e2e8f0;
+  padding-left: 1.5rem;
+  height: 100%;
+}
+.candidate-card.evm-row.selected .evm-panel {
+  border-left-color: #bfdbfe;
+}
+.evm-led {
+  width: 16px;
+  height: 16px;
+  background-color: #581c1c;
+  border-radius: 50%;
+  border: 2px solid #3f0f0f;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+  transition: all 0.2s;
+}
+.evm-led.active {
+  background-color: #ef4444;
+  border-color: #fca5a5;
+  box-shadow: 0 0 12px #f87171, inset 0 1px 1px rgba(255,255,255,0.8);
+  animation: led-glow 1s ease-in-out infinite alternate;
+}
+@keyframes led-glow {
+  0% { transform: scale(1); box-shadow: 0 0 8px #f87171; }
+  100% { transform: scale(1.15); box-shadow: 0 0 16px #f87171, 0 0 4px #ef4444; }
+}
+.evm-blue-button {
+  width: 55px;
+  height: 36px;
+  background: #2563eb;
+  border: 2px solid #1e40af;
+  border-radius: 4px;
+  box-shadow: 0 4px 0 #1d4ed8, 0 4px 6px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  position: relative;
+}
+.candidate-card.evm-row.selected .evm-blue-button {
+  background: #1d4ed8;
+  border-color: #1e3a8a;
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #172554, 0 1px 2px rgba(0,0,0,0.05);
+}
+.candidate-card.evm-row:active .evm-blue-button {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #1e40af, 0 1px 2px rgba(0,0,0,0.05);
+}
+
+
+

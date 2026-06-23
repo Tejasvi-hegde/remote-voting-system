@@ -5,6 +5,7 @@ import BallotScreen from './pages/BallotScreen';
 import ConfirmScreen from './pages/ConfirmScreen';
 import Dashboard from './pages/Dashboard';
 import AdminScreen from './pages/AdminScreen';
+import VerifyPortal from './pages/VerifyPortal';
 import './App.css';
 
 /**
@@ -44,6 +45,9 @@ function App() {
           {/* EC Admin dashboard — separate route, no auth needed */}
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin" element={<AdminScreen />} />
+          
+          {/* Public Verification Route */}
+          <Route path="/verify" element={<VerifyPortal />} />
 
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

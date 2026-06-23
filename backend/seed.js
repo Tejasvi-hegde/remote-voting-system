@@ -111,7 +111,7 @@ async function seed() {
 
     // Bengaluru Central
     ['Ramesh Kumar', 'Party A', 'Lotus', 'Bengaluru Central'],
-    ['Pooja Hegde', 'Party B', 'Hand', 'Bengaluru Central'],
+    ['Pooja Nayak', 'Party B', 'Hand', 'Bengaluru Central'],
     ['Arun Vijay', 'Party C', 'Bicycle', 'Bengaluru Central'],
     ['Shruthi Hassan', 'Party D', 'Elephant', 'Bengaluru Central'],
     ['Prakash Raj', 'Independent', 'Bat', 'Bengaluru Central'],
@@ -119,7 +119,6 @@ async function seed() {
     // Mysuru
     ['Siddaramaiah', 'Party A', 'Lotus', 'Mysuru'],
     ['Pratap Simha', 'Party B', 'Hand', 'Mysuru'],
-    ['Darshan Toogudeepa', 'Party C', 'Bicycle', 'Mysuru'],
     ['Rashmika Mandanna', 'Party D', 'Elephant', 'Mysuru'],
     ['Yash', 'Independent', 'Bat', 'Mysuru'],
   ];

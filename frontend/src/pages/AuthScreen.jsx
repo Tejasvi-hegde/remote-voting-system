@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useTranslation } from '../utils/languages';
 
 /**
  * AuthScreen
@@ -10,6 +11,7 @@ import axios from 'axios';
  */
 function AuthScreen() {
   const navigate = useNavigate();
+  const { t, lang, changeLanguage } = useTranslation();
   const [fingerprintId, setFingerprintId] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -52,7 +54,7 @@ function AuthScreen() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!fingerprintId) return setError('Please enter a Simulated Fingerprint ID first.');
+    if (!fingerprintId) return setError(t('err_fp'));
 
     setError('');
     setLoading(true);
@@ -74,31 +76,44 @@ function AuthScreen() {
     }
   };
 
+  const renderHeader = () => (
+    <div className="ec-header">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <span className="ec-logo">🗳️</span>
+        <div>
+          <h2>{t('eci')}</h2>
+          <p className="terminal-id">{t('terminal_title')}</p>
+        </div>
+      </div>
+      <div className="lang-switcher">
+        <select value={lang} onChange={(e) => changeLanguage(e.target.value)} className="lang-select">
+          <option value="en">English (EN)</option>
+          <option value="hi">हिन्दी (HI)</option>
+          <option value="kn">ಕನ್ನಡ (KN)</option>
+        </select>
+      </div>
+    </div>
+  );
+
   if (!voter) {
     return (
       <div className="screen auth-screen">
-        <div className="ec-header">
-          <span className="ec-logo">🗳️</span>
-          <div>
-            <h2>Election Commission of India</h2>
-            <p className="terminal-id">Secure Voting Terminal</p>
-          </div>
-        </div>
+        {renderHeader()}
 
         <div className="voter-card auth-card">
-          <h3>Welcome, Voter!</h3>
-          <p>Please enter your Simulated Fingerprint ID.</p>
+          <h3>{t('welcome')}</h3>
+          <p>{t('enter_fp')}</p>
 
           <form onSubmit={handleLogin} className="auth-form">
             <input
               type="number"
               className="auth-input"
-              placeholder="Enter Fingerprint ID (e.g. 15)"
+              placeholder={t('fp_placeholder')}
               value={fingerprintId}
               onChange={e => setFingerprintId(e.target.value)}
             />
             <button className="btn-primary auth-btn" type="submit" disabled={loading}>
-              {loading ? 'Scanning...' : 'Simulate Hardware Fingerprint Scan'}
+              {loading ? t('btn_scanning') : t('btn_scan')}
             </button>
           </form>
 
@@ -114,30 +129,24 @@ function AuthScreen() {
 
   return (
     <div className="screen auth-screen">
-      <div className="ec-header">
-        <span className="ec-logo">🗳️</span>
-        <div>
-          <h2>Election Commission of India</h2>
-          <p className="terminal-id">Secure Voting Terminal</p>
-        </div>
-      </div>
+      {renderHeader()}
 
       <div className="voter-card">
-        <div className="verified-badge">✅ Identity Verified (Simulated Fingerprint)</div>
+        <div className="verified-badge">✅ {t('identity_verified')}</div>
         <table className="voter-details">
           <tbody>
-            <tr><td className="label">Name</td><td className="value">{voter.name}</td></tr>
-            <tr><td className="label">Voter ID</td><td className="value">{voter.voterID}</td></tr>
-            <tr><td className="label">Constituency</td><td className="value">{voter.constituency}</td></tr>
-            <tr><td className="label">Session Valid Until</td><td className="value">{voter.expiresAt.toLocaleTimeString()}</td></tr>
+            <tr><td className="label">{t('voter_name')}</td><td className="value">{voter.name}</td></tr>
+            <tr><td className="label">{t('voter_id')}</td><td className="value">{voter.voterID}</td></tr>
+            <tr><td className="label">{t('constituency')}</td><td className="value">{voter.constituency}</td></tr>
+            <tr><td className="label">{t('session_valid')}</td><td className="value">{voter.expiresAt.toLocaleTimeString()}</td></tr>
           </tbody>
         </table>
       </div>
 
       <div className="countdown-box">
-        <p>Loading your ballot in <strong>{countdown}</strong> seconds...</p>
+        <p dangerouslySetInnerHTML={{ __html: t('loading_ballot', { secs: `<strong>${countdown}</strong>` }) }}></p>
         <button className="btn-primary" onClick={() => navigate('/ballot')}>
-          Proceed to Ballot Now →
+          {t('btn_proceed')}
         </button>
       </div>
     </div>

@@ -1,6 +1,23 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { castVote } from '../api';
+import { useTranslation } from '../utils/languages';
+
+const getSymbolEmoji = (symbol) => {
+  const mapping = {
+    'Lotus': '🪷',
+    'Hand': '✋',
+    'Bicycle': '🚲',
+    'Elephant': '🐘',
+    'Bat': '🏏',
+    'Arrow': '🏹',
+    'Spade': '♠️',
+    'Car': '🚗',
+    'Umbrella': '☂️',
+    'NOTA': '🚫'
+  };
+  return mapping[symbol] || '🏛️';
+};
 
 /**
  * ConfirmScreen
@@ -13,6 +30,7 @@ import { castVote } from '../api';
  */
 function ConfirmScreen() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
@@ -44,21 +62,19 @@ function ConfirmScreen() {
     return (
       <div className="screen success-screen">
         <div className="success-icon" style={{ fontSize: '4rem', marginBottom: '1rem' }}>✅</div>
-        <h2>Vote Cast Successfully!</h2>
-        <p className="success-message" style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>
-          Your vote was successfully casted for <strong>{candidate.name}</strong>.<br />
-          It has been securely recorded on the blockchain.
+        <h2>{t('vote_cast_success')}</h2>
+        <p className="success-message" style={{ fontSize: '1.2rem', marginBottom: '2rem' }}
+           dangerouslySetInnerHTML={{ __html: t('vote_cast_desc', { candidate: `<strong>${candidate.name}</strong>` }) }}>
         </p>
 
-        <div className="tx-card" style={{ background: '#f8f9fa', padding: '1.5rem', borderRadius: '8px', border: '1px solid #ccc' }}>
-          <p className="tx-label" style={{ color: '#6c757d', fontWeight: 'bold' }}>Transaction ID (keep this for verification)</p>
-          <p className="tx-id" style={{ fontSize: '1.1rem', wordBreak: 'break-all', fontFamily: 'monospace', color: '#0056b3' }}>{result.transactionID}</p>
-          <p className="tx-time" style={{ color: '#6c757d', marginTop: '0.5rem' }}>Recorded at: {new Date(result.timestamp).toLocaleString()}</p>
+        <div className="tx-card" style={{ background: '#1a202c', padding: '1.5rem', borderRadius: '8px', border: '1px solid #4a5568' }}>
+          <p className="tx-label" style={{ color: '#a0aec0', fontWeight: 'bold' }}>{t('tx_label')}</p>
+          <p className="tx-id" style={{ fontSize: '1.1rem', wordBreak: 'break-all', fontFamily: 'monospace', color: '#63b3ed' }}>{result.transactionID}</p>
+          <p className="tx-time" style={{ color: '#a0aec0', marginTop: '0.5rem' }}>{t('recorded_at', { time: new Date(result.timestamp).toLocaleString() })}</p>
         </div>
 
-        <p className="thank-you" style={{ marginTop: '2rem', fontSize: '1.2rem', fontWeight: 'bold', color: '#28a745' }}>
-          🙏 Thank you for exercising your democratic right. <br />
-          This terminal will reset in a moment.
+        <p className="thank-you" style={{ marginTop: '2rem', fontSize: '1.2rem', fontWeight: 'bold', color: '#48bb78' }}
+           dangerouslySetInnerHTML={{ __html: t('thank_you') }}>
         </p>
 
         <AutoResetTimer seconds={20} onDone={() => {
@@ -74,9 +90,9 @@ function ConfirmScreen() {
     return (
       <div className="screen loading-screen">
         <div className="spinner" />
-        <h2>Submitting your vote...</h2>
-        <p>Please do not touch the screen or leave the terminal.</p>
-        <p>This may take a few seconds while the blockchain confirms.</p>
+        <h2>{t('submitting_vote')}</h2>
+        <p>{t('do_not_touch')}</p>
+        <p>{t('confirm_wait')}</p>
       </div>
     );
   }
@@ -84,13 +100,13 @@ function ConfirmScreen() {
   // ── Confirm state ──────────────────────────────────────────────────────────
   return (
     <div className="screen confirm-screen">
-      <h2>⚠️ Final Confirmation</h2>
+      <h2>{t('final_confirmation')}</h2>
       <p className="confirm-instruction">
-        You are about to cast your vote for:
+        {t('about_to_cast')}
       </p>
 
       <div className="confirm-card">
-        <div className="party-symbol-large">{candidate.partySymbol || '🏛️'}</div>
+        <div className="party-symbol-large">{getSymbolEmoji(candidate.partySymbol)}</div>
         <div className="confirm-details">
           <p className="confirm-candidate-name">{candidate.name}</p>
           <p className="confirm-party">{candidate.party}</p>
@@ -98,10 +114,7 @@ function ConfirmScreen() {
       </div>
 
       <div className="confirm-warning">
-        <p>
-          ⚠️ <strong>This action cannot be undone.</strong><br />
-          Once submitted, your vote is permanently recorded on the blockchain.
-        </p>
+        <p dangerouslySetInnerHTML={{ __html: t('warning_undo') }}></p>
       </div>
 
       {error && (
@@ -115,13 +128,13 @@ function ConfirmScreen() {
           className="btn-secondary"
           onClick={() => navigate('/ballot')}
         >
-          ← Go Back
+          {t('btn_go_back')}
         </button>
         <button
           className="btn-primary btn-confirm"
           onClick={handleConfirm}
         >
-          ✅ Cast My Vote
+          {t('btn_cast_vote')}
         </button>
       </div>
     </div>
@@ -130,19 +143,20 @@ function ConfirmScreen() {
 
 // Auto-resets the terminal after vote is cast
 function AutoResetTimer({ seconds, onDone }) {
+  const { t } = useTranslation();
   const [count, setCount] = React.useState(seconds);
   React.useEffect(() => {
-    const t = setInterval(() => {
+    const tTimer = setInterval(() => {
       setCount((c) => {
-        if (c <= 1) { clearInterval(t); onDone(); return 0; }
+        if (c <= 1) { clearInterval(tTimer); onDone(); return 0; }
         return c - 1;
       });
     }, 1000);
-    return () => clearInterval(t);
+    return () => clearInterval(tTimer);
   }, [onDone]);
   return (
     <p className="reset-notice">
-      Terminal resets in <strong>{count}</strong> seconds...
+      {t('reset_notice', { secs: `<strong>${count}</strong>` })}
     </p>
   );
 }
