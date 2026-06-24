@@ -1,13 +1,21 @@
 require('dotenv').config();
 const { v4: uuidv4 } = require('uuid');
-// db is required to ensure tables exist, but because initDB is async and doesn't return a promise in mysql.js,
-// we might need to wait a second or connect directly.
-// Let's connect directly here to make seeding robust.
+const fs = require('fs');
+const path = require('path');
 const mysql = require('mysql2/promise');
 
 // Dummy FP data removed because we are seeding existing voters without biometrics.
 
 async function seed() {
+  const blockchainPath = path.join(__dirname, 'blockchain', 'blockchain.json');
+  if (fs.existsSync(blockchainPath)) {
+    try {
+      fs.unlinkSync(blockchainPath);
+      console.log('Cleared existing blockchain.json');
+    } catch (err) {
+      console.error('Failed to delete blockchain.json:', err.message);
+    }
+  }
   const host = process.env.MYSQL_HOST || 'localhost';
   const user = process.env.MYSQL_USER || 'root';
   const password = process.env.MYSQL_PASSWORD || 'Mysql@9876';
@@ -34,7 +42,6 @@ async function seed() {
       dob VARCHAR(255),
       address VARCHAR(255),
       constituency VARCHAR(255) NOT NULL,
-      fingerprint_template VARCHAR(255) NULL,
       face_embedding TEXT NULL,
       face_image LONGTEXT NULL,
       has_voted INT DEFAULT 0,
@@ -49,16 +56,9 @@ async function seed() {
   `, [database]);
 
   const voterColumnNames = new Set(voterColumns.map((column) => column.COLUMN_NAME));
-  if (voterColumnNames.has('fingerprint_id') && !voterColumnNames.has('fingerprint_template')) {
-    await connection.query('ALTER TABLE voters CHANGE COLUMN fingerprint_id fingerprint_template VARCHAR(255)');
-  } else if (!voterColumnNames.has('fingerprint_template')) {
-    await connection.query('ALTER TABLE voters ADD COLUMN fingerprint_template VARCHAR(255) AFTER constituency');
-  }
-
-  await connection.query('ALTER TABLE voters MODIFY COLUMN fingerprint_template VARCHAR(255) NULL');
 
   if (!voterColumnNames.has('face_embedding')) {
-    await connection.query('ALTER TABLE voters ADD COLUMN face_embedding TEXT NULL AFTER fingerprint_template');
+    await connection.query('ALTER TABLE voters ADD COLUMN face_embedding TEXT NULL AFTER constituency');
   }
   if (!voterColumnNames.has('face_image')) {
     await connection.query('ALTER TABLE voters ADD COLUMN face_image LONGTEXT NULL AFTER face_embedding');
@@ -79,8 +79,8 @@ async function seed() {
   await connection.query('DELETE FROM candidates');
 
   const insertVoter = `
-    INSERT INTO voters (id, voter_id, name, dob, address, constituency, fingerprint_template, face_embedding, face_image)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO voters (id, voter_id, name, dob, address, constituency, face_embedding, face_image)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   // Generate 50 dummy existing voters using actual EPIC format (e.g. IND0000001)
@@ -98,7 +98,7 @@ async function seed() {
     const address = `${i * 10} Main Road, Block ${i % 5}`;
     const constituency = constituencies[i % constituencies.length];
     
-    await connection.query(insertVoter, [uuidv4(), vId, name, dob, address, constituency, null, null, null]);
+    await connection.query(insertVoter, [uuidv4(), vId, name, dob, address, constituency, null, null]);
   }
 
   const insertCandidate = `

@@ -19,11 +19,7 @@ export default function AdminScreen() {
   const [stream, setStream] = useState(null);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const [piIpAddress, setPiIpAddress] = useState(() => localStorage.getItem('pi_ip_address') || '192.168.1.100');
 
-  useEffect(() => {
-    localStorage.setItem('pi_ip_address', piIpAddress);
-  }, [piIpAddress]);
 
   const [candidateForm, setCandidateForm] = useState({ 
     name: '', 
@@ -88,23 +84,7 @@ export default function AdminScreen() {
     }
   };
 
-  const captureFromPi = async () => {
-    setMessage('Connecting to Raspberry Pi camera...');
-    setCapturedImage(null);
-    try {
-      const cleanIp = piIpAddress.replace(/^(http:\/\/|https:\/\/)/, '').trim();
-      const res = await axios.get(`http://${cleanIp}:5002/capture`, { timeout: 10000 });
-      if (res.data && res.data.success && res.data.faceImage) {
-        setCapturedImage(res.data.faceImage);
-        setMessage('Successfully captured photo from Raspberry Pi webcam!');
-      } else {
-        setMessage(`Error capturing from Pi: ${res.data?.error || 'Unknown error'}`);
-      }
-    } catch (err) {
-      console.error(err);
-      setMessage(`Failed to connect to Pi Camera Server at http://${piIpAddress}:5002. Please ensure the camera server is running on the Raspberry Pi and the IP address is correct.`);
-    }
-  };
+
 
   // Camera Handlers
   const startCamera = async () => {
@@ -143,6 +123,9 @@ export default function AdminScreen() {
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
       setStream(null);
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
     }
     setCameraActive(false);
   };
@@ -249,26 +232,7 @@ export default function AdminScreen() {
                 <div className="biometric-capture-section">
                   <h4>Capture Face Biometrics</h4>
 
-                  <div className="pi-capture-config" style={{ padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', margin: '1rem 0', border: '1px solid rgba(255,255,255,0.1)' }}>
-                    <h5 style={{ margin: '0 0 0.5rem 0' }}>📷 Remote Capture from Raspberry Pi</h5>
-                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                      <input 
-                        type="text" 
-                        placeholder="Raspberry Pi IP (e.g. 192.168.1.45)" 
-                        value={piIpAddress} 
-                        onChange={e => setPiIpAddress(e.target.value)} 
-                        style={{ padding: '0.4rem', borderRadius: '4px', border: '1px solid #ccc', minWidth: '220px', flexGrow: 1, color: '#333' }}
-                      />
-                      <button 
-                        type="button" 
-                        className="btn-success" 
-                        onClick={captureFromPi}
-                        style={{ padding: '0.5rem 1rem' }}
-                      >
-                        Capture from Pi
-                      </button>
-                    </div>
-                  </div>
+
                   
                   <div className="capture-modes" style={{ display: 'flex', gap: '1rem', margin: '1rem 0' }}>
                     {!cameraActive ? (
@@ -288,14 +252,12 @@ export default function AdminScreen() {
                   </div>
 
                   {/* Camera view */}
-                  {cameraActive && (
-                    <div className="camera-view-container" style={{ margin: '1rem 0', position: 'relative' }}>
-                      <video ref={videoRef} style={{ width: '100%', maxWidth: '480px', borderRadius: '8px', border: '2px solid #ccc' }} />
-                      <button type="button" className="btn-success" onClick={capturePhoto} style={{ display: 'block', marginTop: '0.5rem' }}>
-                        📸 Capture Photo
-                      </button>
-                    </div>
-                  )}
+                  <div className="camera-view-container" style={{ display: cameraActive ? 'block' : 'none', margin: '1rem 0', position: 'relative' }}>
+                    <video ref={videoRef} autoPlay playsInline muted style={{ width: '100%', maxWidth: '480px', borderRadius: '8px', border: '2px solid #ccc' }} />
+                    <button type="button" className="btn-success" onClick={capturePhoto} style={{ display: 'block', marginTop: '0.5rem' }}>
+                      📸 Capture Photo
+                    </button>
+                  </div>
 
                   {/* Hidden canvas for taking frames */}
                   <canvas ref={canvasRef} style={{ display: 'none' }} />

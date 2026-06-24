@@ -4,9 +4,7 @@
 ---
 
 ## Project Overview
-Allows migrant voters, students, and out-of-constituency citizens to vote
-from any authorized Remote Voting Centre using biometric authentication
-and Hyperledger Fabric blockchain for tamper-proof vote storage.
+Allows out-of-constituency citizens, students, and migrant voters to securely cast their votes from any authorized Remote Voting Centre (RVC). Authentication is performed using face-recognition biometrics, and votes are secured on a custom tamper-proof file-persisted JS Blockchain.
 
 ---
 
@@ -14,30 +12,24 @@ and Hyperledger Fabric blockchain for tamper-proof vote storage.
 ```
 voting-system/
 ├── backend/              Node.js + Express API server
-│   ├── models/           MongoDB schemas (Voter, Candidate)
-│   ├── routes/           API routes (auth, voter, vote, dashboard)
-│   ├── middleware/        JWT auth middleware
-│   ├── fabric/           Hyperledger Fabric network connector
-│   ├── server.js         Entry point
-│   └── seed.js           Test data seeder
+│   ├── db/               MySQL database schemas & initialization (mysql.js)
+│   ├── routes/           API routes (auth, voter, vote, dashboard, admin)
+│   ├── middleware/       JWT auth middleware
+│   ├── blockchain/       Custom JS Blockchain ledger implementation (chain.js)
+│   ├── server.js         Laptop backend entry point
+│   └── seed.js           Mock database seeder (also cleans blockchain.json)
 │
-├── chaincode/voting/     Hyperledger Fabric smart contract
-│   └── index.js          VotingContract (castVote, getVoteCounts...)
-│
-├── frontend/src/
-│   ├── pages/            AuthScreen, BallotScreen, ConfirmScreen, Dashboard
+├── frontend/src/         React.js Web App
+│   ├── pages/            AuthScreen (Face Scan Pi), Dashboard, Results
 │   ├── api/              Axios API client
 │   └── App.jsx           Router + token initialization
 │
-├── hardware/             Raspberry Pi code (EC student)
-│   ├── enroll.py         One-time voter fingerprint enrollment
-│   └── biometric.py      Main terminal voting script
+├── hardware/             Raspberry Pi 5/4 Interactive Terminal
+│   ├── pi_server.py      HTTP server & main voting terminal (captures face, showcases ballot, posts votes)
+│   ├── candidates.json   Local candidate directory mapped by constituency
+│   └── implementation.md Detailed Raspberry Pi setup & GPIO connection guide
 │
-├── network/              Hyperledger Fabric network config
-│   └── network-setup.sh  Automated network bootstrap script
-│
-└── docker/
-    └── docker-compose.yml  Full system orchestration
+└── README.md             This documentation file
 ```
 
 ---
@@ -45,18 +37,17 @@ voting-system/
 ## Tech Stack
 
 | Layer | Technology |
-|-------|-----------|
-| Frontend | React.js + React Router |
-| Backend | Node.js + Express.js |
-| Database | MySQL via mysql2 (replaces MongoDB/SQLite) |
-| Blockchain | Custom JS Blockchain, file-persisted as blockchain.json (replaces Hyperledger Fabric) |
-| Smart Contract | JavaScript Chaincode |
-| State DB | Removed (CouchDB no longer used) |
-| Biometric | R307/AS608 fingerprint sensor (UART) |
-| Hardware | Raspberry Pi 4 |
-| Encryption | AES-256 (votes) + SHA-256 (biometric hash) |
-| Auth | JWT (15-min sessions) |
-| Containers | Docker + Docker Compose |
+|---|---|
+| **Frontend** | React.js (Vite) + Vanilla CSS |
+| **Backend** | Node.js + Express.js |
+| **Database** | MySQL (mysql2) |
+| **Blockchain** | Custom JS Blockchain, file-persisted as `blockchain.json` |
+| **Biometric** | Facial Recognition via Face-API / Custom 128-d Embeddings |
+| **Hardware** | Raspberry Pi 5 / 4 |
+| **Display** | 1.3" I2C OLED Display (SH1106 / SSD1306) |
+| **Input** | 8-Button GPIO Push Button Module (Buttons 1-8) |
+| **Encryption** | AES-256 (Votes) + SHA-256 (Blockchain Blocks) |
+| **Auth** | JWT (15-min sessions) |
 
 ---
 
@@ -64,148 +55,127 @@ voting-system/
 
 ### Prerequisites
 - Node.js v18+
-- Docker Desktop + Docker Compose
+- MySQL Server (installed and running locally on Laptop)
 - Python 3.9+ (on Raspberry Pi)
-- Go v1.21+ (for Fabric tools)
-- Hyperledger Fabric binaries: https://hyperledger-fabric.readthedocs.io
 
-### 1. Clone and install dependencies
-```bash
-git clone <your-repo>
-cd voting-system
+### 1. Clone & Laptop Setup
+1. Clone the repository and navigate to the project directory:
+   ```bash
+   git clone <your-repo>
+   cd remote-voting-system
+   ```
+2. Install laptop backend dependencies:
+   ```bash
+   cd backend
+   npm install
+   ```
+3. Configure your local database and environment in `backend/.env` (using `backend/.env.example` as a template). Make sure to set:
+   ```env
+   JWT_SECRET=your_jwt_secret
+   VOTE_ENCRYPTION_KEY=your_64_character_hex_encryption_key
+   MYSQL_HOST=localhost
+   MYSQL_USER=root
+   MYSQL_PASSWORD=your_mysql_password
+   MYSQL_DB=voting_db
+   ```
+4. Seed the MySQL database and reset the blockchain ledger:
+   ```bash
+   node seed.js
+   ```
+5. Start the laptop backend server:
+   ```bash
+   node server.js
+   ```
+6. Start the operator dashboard UI:
+   ```bash
+   cd ../frontend
+   npm install
+   npm run dev
+   ```
 
-# Backend
-cd backend && npm install && cd ..
-
-# Frontend
-cd frontend && npm install && cd ..
-
-# Chaincode
-cd chaincode/voting && npm install && cd ../..
-```
-
-### 2. Configure environment variables
-```bash
-cp backend/.env.example backend/.env
-# Edit backend/.env — set JWT_SECRET and VOTE_ENCRYPTION_KEY
-```
-
-### 3. Start Docker services (optional)
-MySQL server is running locally on the laptop. Start other services:
-docker-compose -f docker/docker-compose.yml up -d
-
-### 4. Seed test data
-```bash
-cd backend
-node seed.js
-# This creates sample voters and candidates in the MySQL voting_db
-```
-
-### 5. Start backend
-```bash
-cd backend
-npm start
-```
-
-### 7. Start frontend
-```bash
-cd frontend
-npm start
-# Opens on http://localhost:3000
-```
-
-### 8. Setup Raspberry Pi terminal
-```bash
-# On the Pi
-pip3 install -r hardware/requirements.txt
-
-# Enable UART in /boot/config.txt:
-# enable_uart=1
-
-# Enroll test voters
-python3 hardware/enroll.py
-
-# Start voting terminal
-export BACKEND_URL=http://YOUR_SERVER_IP:5001
-export FRONTEND_URL=http://YOUR_SERVER_IP:3000
-export TERMINAL_ID=RVC-1
-python3 hardware/biometric.py
-```
+### 2. Raspberry Pi Setup
+Detailed step-by-step instructions (including wiring diagrams) can be found in the [implementation.md](file:///d:/voting_nikhil/remote-voting-system/hardware/implementation.md) file.
+1. Move the `hardware/` directory to the Raspberry Pi.
+2. Enable the I2C interface on the Pi via `sudo raspi-config` -> Interface Options.
+3. Install system requirements and set up a Python virtual environment:
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   ```
+4. Connect the I2C OLED Display and the 8 Push Buttons module to the specified GPIO pins (see [implementation.md](file:///d:/voting_nikhil/remote-voting-system/hardware/implementation.md)).
+5. Start the Pi interactive server:
+   ```bash
+   python pi_server.py
+   ```
 
 ---
 
 ## API Reference
 
 | Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register` | Pre-register voter with biometric hash |
-| POST | `/api/auth/verify` | Authenticate voter (returns JWT) |
-| GET | `/api/voter/ballot` | Get candidate list (JWT required) |
-| POST | `/api/vote/cast` | Submit vote to blockchain (JWT required) |
-| GET | `/api/dashboard/results/:id` | Vote counts per constituency |
-| GET | `/api/dashboard/stats` | Turnout statistics |
-| GET | `/api/dashboard/transaction/:txID` | Verify a transaction |
+|---|---|---|
+| **POST** | `/api/auth/verify-face-pi` | Triggers Pi camera capture, extracts face embeddings, performs verification, and starts the Pi showcase. |
+| **POST** | `/api/vote/cast-pi` | Receives ballot button clicked index from Pi, encrypts candidate selection, and records it on the blockchain. |
+| **GET** | `/api/admin/voter/lookup/:voterID` | Fetch voter information from database. |
+| **POST** | `/api/admin/voter/register-face` | Saves base64 photo and registers a voter's face embedding. |
+| **GET** | `/api/dashboard/results/:constituency` | Fetch live vote counts from blockchain. |
+| **GET** | `/api/dashboard/stats` | Fetch system turnout statistics. |
+| **GET** | `/api/dashboard/blockchain` | Fetch all blocks in the blockchain ledger. |
 
 ---
 
-## Voting Flow
+## End-to-End Hybrid Voting Flow
 
-  Pi captures fingerprint
-        ↓
-  Sensor outputs ASCII template → saved to /tmp/scan_fp.txt
-        ↓
-  POST /api/auth/verify  { voterID, fingerprintAscii, terminalID }
-        ↓
-  MySQL: fetch voter record by voterID
-        ↓
-  ASCII template similarity comparison (threshold: 85%)
-        ↓
-  If match → JWT issued (15-min expiry)
-        ↓
-  React ballot loads (constituency candidates from MySQL via JWT)
-        ↓
-  Voter selects candidate → Confirm screen
-        ↓
-  POST /api/vote/cast → AES-256 encrypt candidateID
-        ↓
-  Custom JS Blockchain: addBlock({ voterID, encryptedVote, candidateID, constituency })
-        ↓
-  MySQL: voters SET has_voted = 1
-        ↓
-  Block hash returned as Transaction ID
+```
+   Laptop Dashboard: Operator initiates "Face Scan (Pi)" 
+                       ↓
+   Laptop Backend calls GET http://<PI_IP>:5002/capture
+                       ↓
+   Pi Server captures camera photo and returns base64 string
+                       ↓
+   Laptop Backend matches face embeddings via Cosine Distance 
+                       ↓
+   If match -> Laptop issues JWT & calls POST http://<PI_IP>:5002/showcase
+                       ↓
+   Pi Screen showcases voter details & waits for YES (Btn 1)
+                       ↓
+   Pi Screen showcases candidate ballot (sorted list from candidates.json)
+                       ↓
+   Voter selects Candidate (Btn 3-7) or NOTA (Btn 8) & confirms with YES (Btn 1)
+                       ↓
+   Pi Server posts choice back to Laptop: POST /api/vote/cast-pi
+                       ↓
+   Laptop encrypts vote with AES-256 and appends blocks to ledger (blockchain.json)
+                       ↓
+   MySQL updates voters has_voted = 1, and Pi Screen displays Success!
+```
 
 ---
 
-## EC Student Contributions
-- Raspberry Pi 4 hardware setup and UART wiring
-- R307 fingerprint sensor integration (enroll.py, biometric.py)
-- SHA-256 biometric hashing pipeline
-- Local SQLite offline vote buffer and sync
-- Terminal kiosk mode (Chromium fullscreen)
-- Voter ID barcode scanner integration
+## Team Contributions
 
-## CS Student Contributions
-- Hyperledger Fabric network configuration and chaincode
-- Node.js backend (auth, voter, vote, dashboard APIs)
-- MongoDB schema design
-- React.js frontend (3-screen voting flow + EC dashboard)
-- JWT session management and AES-256 vote encryption
-- Docker containerization
+### EC Student Contributions
+- Raspberry Pi hardware setup, CSI/Webcam camera driver interface, and I2C OLED connection wiring.
+- GPIO button mapping and input loop implementation in `pi_server.py`.
+- Base64 image capturing and optimization for standard USB Logitech webcams.
+
+### CS Student Contributions
+- Node.js backend (face verification, blockchain construction, database schema design, and administration APIs).
+- Customized cryptographic module implementing AES-256 CBC vote encryption.
+- React.js frontend web app featuring dashboard metrics and interactive biometric triggering.
 
 ---
 
 ## Security Features
-1. **Biometric auth**: SHA-256 fingerprint hash — raw biometric never leaves the Pi
-2. **Duplicate prevention**: Double-checked in both MongoDB AND blockchain chaincode
-3. **Vote secrecy**: AES-256 encrypted votes on ledger — only EC can decrypt
-4. **Session security**: JWT expires in 15 minutes; cleared after vote
-5. **Rate limiting**: 10 auth attempts per 15 min per IP
-6. **Timing-safe comparison**: `crypto.timingSafeEqual` prevents timing attacks
-7. **TLS everywhere**: All Fabric peer communication uses TLS
+1. **Facial Cosine Similarity Match**: Bypasses traditional plaintext passwords, performing 128-d vector matching on the backend.
+2. **Double-Spend Prevention**: Voters are double-checked on both the MySQL relational database (`has_voted` column) and the blockchain ledger (`voterID` block presence check) before casting is allowed.
+3. **Vote Secrecy**: The voter status block and actual candidate choice blocks are written to the ledger as two separate, decoupled events, ensuring individual choices cannot be linked back to a specific voter.
+4. **AES-256 CBC Encryption**: Votes are encrypted with a secure 32-byte secret key on the blockchain.
 
 ---
 
-## Team
+## Team RVCE
 | Name | Program | USN |
 |------|---------|-----|
 | Tejasvi Vasant Hegde | CSE | 1RV23CS272 |
@@ -213,5 +183,5 @@ python3 hardware/biometric.py
 | Rohit N Katti | ECE | 1RV23EC123 |
 | Sarath Sanjay S | ECE | 1RV23EC132 |
 
-**Guide**: Dr. N S Narahari, Visiting Professor, IEM Department  
+**Guide**: Dr. N S Narahari, IEM Department  
 **Institution**: RV College of Engineering, Bengaluru

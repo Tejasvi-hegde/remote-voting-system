@@ -34,6 +34,12 @@ def get_embedding(img_base64):
     try:
         img_data = base64.b64decode(img_base64)
         img = Image.open(io.BytesIO(img_data)).convert('RGB')
+        
+        # Optimize performance and prevent out-of-memory or scaling issues with large images
+        max_size = 800
+        if img.width > max_size or img.height > max_size:
+            img.thumbnail((max_size, max_size), Image.BICUBIC if hasattr(Image, 'BICUBIC') else 3)
+            
         img_np = np.array(img)
         
         # Extract face encodings (default threshold and model)

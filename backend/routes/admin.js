@@ -45,37 +45,11 @@ router.get('/voter/lookup/:voterID', async (req, res) => {
   }
 
   try {
-    const [voters] = await db.query('SELECT voter_id, name, dob, address, constituency, fingerprint_template, face_embedding IS NOT NULL AS has_face FROM voters WHERE voter_id = ?', [formattedVoterID]);
+    const [voters] = await db.query('SELECT voter_id, name, dob, address, constituency, face_embedding IS NOT NULL AS has_face FROM voters WHERE voter_id = ?', [formattedVoterID]);
     if (voters.length === 0) {
       return res.status(404).json({ error: 'Voter not found in national database' });
     }
     res.json(voters[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// POST /api/admin/voter/register-migrant
-router.post('/voter/register-migrant', async (req, res) => {
-  const db = req.app.locals.db;
-  const { voterID, fingerprintId } = req.body;
-
-  if (!voterID || !fingerprintId) {
-    return res.status(400).json({ error: 'Missing voterID or fingerprint ID' });
-  }
-
-  try {
-    const [result] = await db.query(`
-      UPDATE voters 
-      SET fingerprint_template = ? 
-      WHERE voter_id = ?
-    `, [String(fingerprintId), voterID.toUpperCase()]);
-    
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Voter not found' });
-    }
-
-    res.json({ message: 'Voter successfully registered as migrant (fingerprint linked)' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
