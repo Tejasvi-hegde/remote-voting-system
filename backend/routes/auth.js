@@ -3,6 +3,19 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const { extractFaceEmbedding, getEuclideanDistance } = require('../utils/face');
+const os = require('os');
+
+function getLocalIpAddress() {
+  const interfaces = os.networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return '127.0.0.1';
+}
 
 const rpID = 'localhost';
 const origin = 'http://localhost:3000';
@@ -129,32 +142,61 @@ router.post('/verify-face', async (req, res) => {
 // Body: { piIp }
 router.post('/verify-face-pi', async (req, res) => {
   const db = req.app.locals.db;
-  const { piIp } = req.body;
-
-  if (!piIp) {
-    return res.status(400).json({ error: 'piIp (Raspberry Pi IP address) is required.' });
-  }
-
+  const piIp = req.body.piIp || 'raspberrypi.local';
   const cleanIp = piIp.replace(/^(http:\/\/|https:\/\/)/, '').trim();
   const piUrl = `http://${cleanIp}:5002`;
 
   try {
     // 1. Fetch photo from Raspberry Pi camera
     console.log(`[Pi Verify] Contacting Raspberry Pi camera at ${piUrl}/capture`);
-    const captureRes = await fetch(`${piUrl}/capture`, { signal: AbortSignal.timeout(10000) });
+    const captureRes = await fetch(`${piUrl}/capture`, { signal: AbortSignal.timeout(20000) });
     if (!captureRes.ok) {
       throw new Error(`Failed to contact Pi camera server (HTTP ${captureRes.status})`);
     }
     const captureData = await captureRes.json();
-    if (!captureData.success || !captureData.faceImage) {
+    if (!captureData.success || (!captureData.faceImage && !captureData.faceImages)) {
       return res.status(502).json({ error: `Pi camera capture error: ${captureData.error || 'No image returned.'}` });
     }
 
-    const { faceImage } = captureData;
+    const { faceImage, faceImages } = captureData;
 
-    // 2. Extract 128-d face embedding from captured image
-    console.log('[Pi Verify] Extracting face embedding from snapshot...');
-    const capturedEmbedding = await extractFaceEmbedding(faceImage);
+    // 2. Extract 128-d face embedding from captured images.
+    // Try to get a valid embedding from any of the captured frames in sequence.
+    const imagesToTry = faceImages && Array.isArray(faceImages) ? faceImages : [faceImage];
+    let capturedEmbedding = null;
+    let extractionError = null;
+
+    console.log(`[Pi Verify] Extracting face embedding from ${imagesToTry.length} snapshots...`);
+    
+    for (let i = 0; i < imagesToTry.length; i++) {
+      try {
+        const result = await extractFaceEmbedding(imagesToTry[i]);
+        if (result && !result.error) {
+          capturedEmbedding = result;
+          console.log(`[Pi Verify] Successfully extracted face embedding from frame ${i + 1}`);
+          break; // Stop at the first successful extraction!
+        }
+      } catch (err) {
+        console.warn(`[Pi Verify] Failed to extract from frame ${i + 1}:`, err.message);
+        extractionError = err;
+      }
+    }
+
+    if (!capturedEmbedding) {
+      try {
+        const fs = require('fs');
+        const path = require('path');
+        const imgData = imagesToTry[0].includes(',') ? imagesToTry[0].split(',')[1] : imagesToTry[0];
+        fs.writeFileSync(path.join(__dirname, '..', 'failed_capture.jpg'), Buffer.from(imgData, 'base64'));
+        console.log('[Pi Verify] Saved failed capture to backend/failed_capture.jpg for diagnostic purposes.');
+      } catch (err) {
+        console.error('[Pi Verify] Failed to save diagnostic image:', err.message);
+      }
+
+      return res.status(502).json({ 
+        error: `Pi camera verification error: ${extractionError ? extractionError.message : 'No face detected in any of the snapshots. Please make sure the voter stands clearly in front of the camera.'}` 
+      });
+    }
 
     // 3. Fetch all voters who have registered face embeddings
     const [voters] = await db.query(
@@ -207,7 +249,11 @@ router.post('/verify-face-pi', async (req, res) => {
 
     // 8. Contact Raspberry Pi to showcase candidates
     // Pass laptop's backendUrl so Pi knows where to POST the final vote!
-    const host = req.headers.host || `localhost:${process.env.PORT || 5001}`;
+    let host = req.headers.host || `localhost:${process.env.PORT || 5001}`;
+    if (host.includes('localhost') || host.includes('127.0.0.1') || host.includes('[::1]')) {
+      const localIp = getLocalIpAddress();
+      host = host.replace(/localhost|127\.0\.0\.1|\[::1\]/, localIp);
+    }
     // If it's localhost, fallback to standard http, otherwise infer from headers
     const protocol = req.headers['x-forwarded-proto'] || 'http';
     const backendUrl = `${protocol}://${host}`;

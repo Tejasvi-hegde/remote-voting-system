@@ -43,10 +43,15 @@ def get_embedding(img_base64):
         img_np = np.array(img)
         
         # Extract face encodings (default threshold and model)
-        encodings = face_recognition.face_encodings(img_np)
-        if len(encodings) == 0:
+        # Try face detection with 1 upsampling first, fall back to 2 upsamplings if not found
+        face_locations = face_recognition.face_locations(img_np, number_of_times_to_upsample=1)
+        if len(face_locations) == 0:
+            face_locations = face_recognition.face_locations(img_np, number_of_times_to_upsample=2)
+            
+        if len(face_locations) == 0:
             return {"error": "No face detected in the image. Please try again with better lighting or adjustment."}
             
+        encodings = face_recognition.face_encodings(img_np, known_face_locations=face_locations)
         return encodings[0].tolist()
     except Exception as e:
         return {"error": f"Failed to extract face embedding: {str(e)}"}

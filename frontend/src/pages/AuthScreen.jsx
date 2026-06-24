@@ -13,7 +13,6 @@ function AuthScreen() {
   const [error, setError] = useState('');
 
   // Pi Verification State
-  const [piIp, setPiIp] = useState(() => localStorage.getItem('pi_ip_address') || '192.168.1.100');
   const [piVerifying, setPiVerifying] = useState(false);
   const [piSuccessVoter, setPiSuccessVoter] = useState(null);
 
@@ -21,11 +20,10 @@ function AuthScreen() {
     e.preventDefault();
     setError('');
     setPiVerifying(true);
-    localStorage.setItem('pi_ip_address', piIp);
 
     try {
       const { data } = await axios.post('http://localhost:5001/api/auth/verify-face-pi', {
-        piIp: piIp.trim()
+        piIp: 'raspberrypi.local'
       });
       if (data.success) {
         setPiSuccessVoter({
@@ -83,7 +81,7 @@ function AuthScreen() {
 
           <div style={{ padding: '1.25rem', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', color: '#166534', marginBottom: '2rem', textAlign: 'left', lineHeight: '1.5' }}>
             <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.05rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>👉 Physical EVM Ready</h4>
-            <p style={{ margin: 0, fontSize: '0.95rem' }}>Please ask the voter to proceed to the <strong>Raspberry Pi EVM Terminal</strong>. They must press <strong>YES (Button 1)</strong> on the terminal to view their ballot and cast their vote.</p>
+            <p style={{ margin: 0, fontSize: '0.95rem' }}>Please ask the voter to proceed to the <strong>Raspberry Pi EVM Terminal</strong>. They must press <strong>YES (Button 7)</strong> on the terminal to view their ballot and cast their vote.</p>
           </div>
 
           <button 
@@ -113,18 +111,7 @@ function AuthScreen() {
         </p>
 
         <form onSubmit={handlePiFaceVerify}>
-          <div style={{ margin: '0 0 1.5rem 0' }}>
-            <label style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#475569', display: 'block', marginBottom: '0.5rem' }}>Raspberry Pi IP Address</label>
-            <input
-              type="text"
-              placeholder="e.g. 192.168.1.100"
-              value={piIp}
-              onChange={e => setPiIp(e.target.value)}
-              style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', boxSizing: 'border-box' }}
-              disabled={piVerifying}
-              required
-            />
-          </div>
+
           
           <button 
             className="btn-primary" 

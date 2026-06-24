@@ -174,13 +174,13 @@ Ensure your Laptop and Raspberry Pi are connected to the same local hotspot.
 
 ### Step 5: Perform Face Verification (Voter Login)
 1. On the Laptop Browser, go to the Voter Authentication screen: `http://localhost:3000/` (or click Authenticate tab).
-2. Enter the Raspberry Pi's IP address (e.g. `192.168.137.56`) and the Voter ID (e.g. `IND0000002`).
-3. Click **Face Scan**.
+2. The system automatically routes connections to the Pi using its hostname `raspberrypi.local` (removing the need to configure IP addresses in the UI).
+3. Click **Capture & Verify Face**.
 4. **The Laptop Backend**:
-   - Makes a request to the Pi server at `http://<PI_IP>:5002/capture`.
+   - Makes a request to the Pi server at `http://raspberrypi.local:5002/capture`.
    - Snaps the voter's face photo from the camera connected to the Pi.
    - Calculates the 128-d vector distance against the registered Laptop face embedding.
-   - If verified, creates a signed session JWT and posts voter details to the Pi at `http://<PI_IP>:5002/showcase`.
+   - If verified, creates a signed session JWT and posts voter details to the Pi at `http://raspberrypi.local:5002/showcase`.
 
 ### Step 6: Cast Ballot on Pi EVM Terminal
 1. The Raspberry Pi OLED display lights up showing:
