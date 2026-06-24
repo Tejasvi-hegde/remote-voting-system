@@ -83,7 +83,7 @@ class Blockchain {
   }
 
   getAllVotes() {
-    return this.chain.filter(b => b.data && b.data.voterID);
+    return this.chain.filter(b => b.data && b.data.candidateID);
   }
 
   findByHash(txHash) {

@@ -1,5 +1,6 @@
-pyfingerprint==2.2.1
 requests==2.31.0
-hashlib        # built-in, listed for reference
 RPi.GPIO==0.7.1
 Pillow==10.1.0
+numpy==1.26.2
+luma.oled==3.8.1
+opencv-python==4.8.1.78

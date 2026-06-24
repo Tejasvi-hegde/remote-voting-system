@@ -1,0 +1,29 @@
+{
+  "Bengaluru South": [
+    {"name": "Anand Raj", "party": "Party A", "symbol": "Lotus"},
+    {"name": "Rahul Dravid", "party": "Independent", "symbol": "Bat"},
+    {"name": "Rakesh Sharma", "party": "Party C", "symbol": "Bicycle"},
+    {"name": "Sunita Devi", "party": "Party B", "symbol": "Hand"},
+    {"name": "Vidya Balan", "party": "Party D", "symbol": "Elephant"}
+  ],
+  "Bengaluru North": [
+    {"name": "Akshata Murthy", "party": "Party D", "symbol": "Elephant"},
+    {"name": "Chetan Kumar", "party": "Party C", "symbol": "Bicycle"},
+    {"name": "Kiran Bhat", "party": "Party A", "symbol": "Lotus"},
+    {"name": "Meena Rao", "party": "Party B", "symbol": "Hand"},
+    {"name": "Srinivas Gowda", "party": "Independent", "symbol": "Bat"}
+  ],
+  "Bengaluru Central": [
+    {"name": "Arun Vijay", "party": "Party C", "symbol": "Bicycle"},
+    {"name": "Pooja Nayak", "party": "Party B", "symbol": "Hand"},
+    {"name": "Prakash Raj", "party": "Independent", "symbol": "Bat"},
+    {"name": "Ramesh Kumar", "party": "Party A", "symbol": "Lotus"},
+    {"name": "Shruthi Hassan", "party": "Party D", "symbol": "Elephant"}
+  ],
+  "Mysuru": [
+    {"name": "Pratap Simha", "party": "Party B", "symbol": "Hand"},
+    {"name": "Rashmika Mandanna", "party": "Party D", "symbol": "Elephant"},
+    {"name": "Siddaramaiah", "party": "Party A", "symbol": "Lotus"},
+    {"name": "Yash", "party": "Independent", "symbol": "Bat"}
+  ]
+}

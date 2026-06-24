@@ -22,6 +22,8 @@ async function seed() {
   connection = await mysql.createConnection({ host, user, password, database });
 
   console.log('Seeding database...');
+  await connection.query('DROP TABLE IF EXISTS candidates');
+  await connection.query('DROP TABLE IF EXISTS voters');
   
   // Ensure tables exist
   await connection.query(`
@@ -33,6 +35,8 @@ async function seed() {
       address VARCHAR(255),
       constituency VARCHAR(255) NOT NULL,
       fingerprint_template VARCHAR(255) NULL,
+      face_embedding TEXT NULL,
+      face_image LONGTEXT NULL,
       has_voted INT DEFAULT 0,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
@@ -46,16 +50,24 @@ async function seed() {
 
   const voterColumnNames = new Set(voterColumns.map((column) => column.COLUMN_NAME));
   if (voterColumnNames.has('fingerprint_id') && !voterColumnNames.has('fingerprint_template')) {
-    await connection.query(`ALTER TABLE voters CHANGE COLUMN fingerprint_id fingerprint_template VARCHAR(255)`);
+    await connection.query('ALTER TABLE voters CHANGE COLUMN fingerprint_id fingerprint_template VARCHAR(255)');
   } else if (!voterColumnNames.has('fingerprint_template')) {
-    await connection.query(`ALTER TABLE voters ADD COLUMN fingerprint_template VARCHAR(255) AFTER constituency`);
+    await connection.query('ALTER TABLE voters ADD COLUMN fingerprint_template VARCHAR(255) AFTER constituency');
   }
 
-  await connection.query(`ALTER TABLE voters MODIFY COLUMN fingerprint_template VARCHAR(255) NULL`);
+  await connection.query('ALTER TABLE voters MODIFY COLUMN fingerprint_template VARCHAR(255) NULL');
+
+  if (!voterColumnNames.has('face_embedding')) {
+    await connection.query('ALTER TABLE voters ADD COLUMN face_embedding TEXT NULL AFTER fingerprint_template');
+  }
+  if (!voterColumnNames.has('face_image')) {
+    await connection.query('ALTER TABLE voters ADD COLUMN face_image LONGTEXT NULL AFTER face_embedding');
+  }
 
   await connection.query(`
     CREATE TABLE IF NOT EXISTS candidates (
       id VARCHAR(255) PRIMARY KEY,
+      voter_id VARCHAR(255) UNIQUE NOT NULL,
       name VARCHAR(255) NOT NULL,
       party VARCHAR(255) NOT NULL,
       symbol VARCHAR(255),
@@ -67,17 +79,17 @@ async function seed() {
   await connection.query('DELETE FROM candidates');
 
   const insertVoter = `
-    INSERT INTO voters (id, voter_id, name, dob, address, constituency, fingerprint_template)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO voters (id, voter_id, name, dob, address, constituency, fingerprint_template, face_embedding, face_image)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  // Generate 50 dummy existing voters
+  // Generate 50 dummy existing voters using actual EPIC format (e.g. IND0000001)
   const constituencies = ['Bengaluru South', 'Bengaluru North', 'Bengaluru Central', 'Mysuru'];
   const firstNames = ['Amit', 'Priya', 'Ravi', 'Sunita', 'Mohan', 'Kiran', 'Meena', 'Rahul', 'Sneha', 'Vikram'];
   const lastNames = ['Sharma', 'Kumar', 'Das', 'Bhat', 'Rao', 'Patil', 'Reddy', 'Gowda', 'Singh', 'Jain'];
   
   for (let i = 1; i <= 50; i++) {
-    const vId = `VTR${String(i).padStart(3, '0')}`;
+    const vId = `IND${String(i).padStart(7, '0')}`;
     const name = `${firstNames[i % firstNames.length]} ${lastNames[i % lastNames.length]}`;
     const year = 1960 + (i % 40);
     const month = String((i % 12) + 1).padStart(2, '0');
@@ -86,12 +98,12 @@ async function seed() {
     const address = `${i * 10} Main Road, Block ${i % 5}`;
     const constituency = constituencies[i % constituencies.length];
     
-    await connection.query(insertVoter, [uuidv4(), vId, name, dob, address, constituency, null]);
+    await connection.query(insertVoter, [uuidv4(), vId, name, dob, address, constituency, null, null, null]);
   }
 
   const insertCandidate = `
-    INSERT INTO candidates (id, name, party, symbol, constituency)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO candidates (id, voter_id, name, party, symbol, constituency)
+    VALUES (?, ?, ?, ?, ?, ?)
   `;
 
   const extraCandidates = [
@@ -123,13 +135,30 @@ async function seed() {
     ['Yash', 'Independent', 'Bat', 'Mysuru'],
   ];
 
-  for (const c of extraCandidates) {
-    await connection.query(insertCandidate, [uuidv4(), c[0], c[1], c[2], c[3]]);
+  for (let idx = 0; idx < extraCandidates.length; idx++) {
+    const c = extraCandidates[idx];
+    const cVoterId = `CAN${String(idx + 1).padStart(7, '0')}`;
+    
+    // Register candidate as a voter first
+    await connection.query(insertVoter, [
+      uuidv4(),
+      cVoterId,
+      c[0], // name
+      '1975-08-15', // dob
+      'Candidate Constituency Office', // address
+      c[3], // constituency
+      null, // fingerprint
+      null, // face embedding
+      null  // face image
+    ]);
+
+    // Insert candidate
+    await connection.query(insertCandidate, [uuidv4(), cVoterId, c[0], c[1], c[2], c[3]]);
   }
 
   console.log('✅ MySQL database seeded successfully.');
-  console.log('   50 dummy voters created without fingerprints.');
-  console.log('   Candidates seeded.');
+  console.log('   50 dummy voters created with EPIC IDs.');
+  console.log('   Candidates registered as voters and seeded.');
   await connection.end();
 }
 

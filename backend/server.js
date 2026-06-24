@@ -36,7 +36,7 @@ app.use(globalLimiter);
 // Auth endpoints get a tighter limiter (prevents brute force)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: process.env.NODE_ENV === 'development' ? 1000 : 10,
   message: { error: 'Too many auth attempts. Try again in 15 minutes.' }
 });
 
