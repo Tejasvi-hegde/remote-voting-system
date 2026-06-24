@@ -104,7 +104,7 @@ router.post('/cast-pi', authMiddleware, async (req, res) => {
     );
 
     let candidateID;
-    if (clickedNumber === 8 || clickedNumber === 'NOTA') {
+    if (clickedNumber === 6 || clickedNumber === 8 || clickedNumber === 'NOTA') {
       candidateID = 'NOTA';
     } else {
       const candIdx = Number(clickedNumber) - 1; // Convert 1-based index to 0-based

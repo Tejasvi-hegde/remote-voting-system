@@ -51,16 +51,16 @@ def stdin_reader():
 threading.Thread(target=stdin_reader, daemon=True).start()
 
 # ── GPIO Button Config ────────────────────────────────────────────────────────
-PIN_YES = 17       # Button 1 (Confirm / YES)
-PIN_NO = 27        # Button 2 (Cancel / NO)
-PIN_CAND1 = 22     # Button 3
-PIN_CAND2 = 23     # Button 4
-PIN_CAND3 = 24     # Button 5
-PIN_CAND4 = 25     # Button 6
-PIN_CAND5 = 5      # Button 7
-PIN_NOTA = 6       # Button 8
+PIN_CAND1 = 17     # Button 1
+PIN_CAND2 = 27     # Button 2
+PIN_CAND3 = 22     # Button 3
+PIN_CAND4 = 23     # Button 4
+PIN_CAND5 = 24     # Button 5
+PIN_NOTA = 25      # Button 6
+PIN_YES = 5        # Button 7
+PIN_NO = 6         # Button 8
 
-PINS = [PIN_YES, PIN_NO, PIN_CAND1, PIN_CAND2, PIN_CAND3, PIN_CAND4, PIN_CAND5, PIN_NOTA]
+PINS = [PIN_CAND1, PIN_CAND2, PIN_CAND3, PIN_CAND4, PIN_CAND5, PIN_NOTA, PIN_YES, PIN_NO]
 
 # Detect physical GPIO buttons
 HAS_GPIO = False
@@ -141,54 +141,54 @@ def get_button_press():
     """
     Checks physical buttons and stdin queue.
     Returns:
-        1: YES / Confirm Choice
-        2: NO / Cancel Choice
-        3-7: Candidate 1-5 selection
-        8: NOTA selection
+        1-5: Candidate 1-5 selection
+        6: NOTA selection
+        7: YES / Confirm Choice
+        8: NO / Cancel Choice
     """
     if HAS_GPIO:
-        if GPIO.input(PIN_YES) == GPIO.LOW:
-            time.sleep(0.2)
-            return 1
-        if GPIO.input(PIN_NO) == GPIO.LOW:
-            time.sleep(0.2)
-            return 2
         if GPIO.input(PIN_CAND1) == GPIO.LOW:
             time.sleep(0.2)
-            return 3
+            return 1
         if GPIO.input(PIN_CAND2) == GPIO.LOW:
             time.sleep(0.2)
-            return 4
+            return 2
         if GPIO.input(PIN_CAND3) == GPIO.LOW:
             time.sleep(0.2)
-            return 5
+            return 3
         if GPIO.input(PIN_CAND4) == GPIO.LOW:
             time.sleep(0.2)
-            return 6
+            return 4
         if GPIO.input(PIN_CAND5) == GPIO.LOW:
             time.sleep(0.2)
-            return 7
+            return 5
         if GPIO.input(PIN_NOTA) == GPIO.LOW:
+            time.sleep(0.2)
+            return 6
+        if GPIO.input(PIN_YES) == GPIO.LOW:
+            time.sleep(0.2)
+            return 7
+        if GPIO.input(PIN_NO) == GPIO.LOW:
             time.sleep(0.2)
             return 8
 
     try:
         char = input_queue.get_nowait()
-        if char == 'y':
-            return 1
-        if char == 'n':
-            return 2
         if char == '1':
-            return 3
+            return 1
         if char == '2':
-            return 4
+            return 2
         if char == '3':
-            return 5
+            return 3
         if char == '4':
-            return 6
+            return 4
         if char == '5':
-            return 7
+            return 5
         if char == '6':
+            return 6
+        if char == 'y':
+            return 7
+        if char == 'n':
             return 8
     except queue.Empty:
         pass
@@ -245,10 +245,10 @@ def print_console_ballot(candidates, constituency):
     print(f"  BALLOT CONSTITUENCY: {constituency}")
     print("=========================================")
     for idx, c in enumerate(candidates):
-        print(f" Button {idx + 3} -> Candidate {idx + 1}: {c['name']} ({c['party']})")
-    print(" Button 8 -> NOTA (None of the Above)")
+        print(f" Button {idx + 1} -> Candidate {idx + 1}: {c['name']} ({c['party']})")
+    print(" Button 6 -> NOTA (None of the Above)")
     print("=========================================")
-    print(" Please press button (3-7 for candidates, 8 for NOTA)")
+    print(" Please press button (1-5 for candidates, 6 for NOTA)")
     print("=========================================")
 
 def run_voting_flow(token, voter_id, name, constituency, backend_url):
@@ -283,7 +283,7 @@ def run_voting_flow(token, voter_id, name, constituency, backend_url):
     display.show(
         f"Voter: {name[:20]}",
         f"Area: {constituency[:20]}",
-        "Press YES (Btn1) to",
+        "Press YES (Btn7) to",
         "confirm & view ballot"
     )
     
@@ -291,10 +291,10 @@ def run_voting_flow(token, voter_id, name, constituency, backend_url):
     timeout = time.time() + 60
     while time.time() < timeout:
         press = get_button_press()
-        if press == 1:
+        if press == 7:
             ready_confirmed = True
             break
-        elif press == 2:
+        elif press == 8:
             display.show("VOTING CANCELLED", "Returning to start...", "", "")
             time.sleep(2)
             reset_to_idle()
@@ -315,8 +315,8 @@ def run_voting_flow(token, voter_id, name, constituency, backend_url):
         while True:
             line1 = f"1: {candidates[0]['name'][:10]} | 2: {candidates[1]['name'][:10]}" if len(candidates) > 1 else f"1: {candidates[0]['name'][:10]}" if len(candidates) > 0 else ""
             line2 = f"3: {candidates[2]['name'][:10]} | 4: {candidates[3]['name'][:10]}" if len(candidates) > 3 else f"3: {candidates[2]['name'][:10]}" if len(candidates) > 2 else ""
-            line3 = f"5: {candidates[4]['name'][:10]} | 8: NOTA" if len(candidates) > 4 else "8: NOTA"
-            line4 = "Btn 3-7: Cand | Btn 8: NOTA"
+            line3 = f"5: {candidates[4]['name'][:10]} | 6: NOTA" if len(candidates) > 4 else "6: NOTA"
+            line4 = "Btn 1-5: Cand | Btn 6: NOTA"
             
             print_console_ballot(candidates, constituency)
             display.show(line1, line2, line3, line4)
@@ -335,36 +335,36 @@ def run_voting_flow(token, voter_id, name, constituency, backend_url):
                 reset_to_idle()
                 return
                 
-            if press >= 3 and press <= 7:
-                cand_idx = press - 3
+            if press >= 1 and press <= 5:
+                cand_idx = press - 1
                 if cand_idx < len(candidates):
                     selected_candidate = candidates[cand_idx]
                     selected_idx = cand_idx + 1
                     break
-            elif press == 8:
+            elif press == 6:
                 selected_candidate = {"name": "NOTA", "party": "None of the Above"}
-                selected_idx = 8
+                selected_idx = 6
                 break
 
         # 3. Confirm Choice
         display.show(
             f"Vote for: {selected_candidate['name'][:18]}",
             f"Party: {selected_candidate['party'][:20]}",
-            "Confirm? YES (Btn1)",
-            "Cancel? NO (Btn2)"
+            "Confirm? YES (Btn7)",
+            "Cancel? NO (Btn8)"
         )
         
         confirm_press = None
         timeout = time.time() + 30
         while time.time() < timeout:
             confirm_press = get_button_press()
-            if confirm_press in [1, 2]:
+            if confirm_press in [7, 8]:
                 break
             time.sleep(0.1)
             
-        if confirm_press == 1:
+        if confirm_press == 7:
             break  # Confirmed! Proceed to send.
-        elif confirm_press == 2:
+        elif confirm_press == 8:
             continue  # Re-run selection loop.
         else:
             display.show("SESSION TIMEOUT", "Returning to start...", "", "")
