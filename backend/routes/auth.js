@@ -82,11 +82,13 @@ router.post('/verify-face', async (req, res) => {
     // 3. Compare captured embedding with each registered embedding to find best match
     let matchedVoter = null;
     let minDistance = Infinity;
+    console.log(`[Face Match] Comparing captured face against ${voters.length} registered voters:`);
 
     for (const voter of voters) {
       try {
         const storedEmbedding = JSON.parse(voter.face_embedding);
         const distance = getEuclideanDistance(capturedEmbedding, storedEmbedding);
+        console.log(`  - Comparing with ${voter.name} (${voter.voter_id}): distance = ${distance.toFixed(4)}`);
         if (distance < minDistance) {
           minDistance = distance;
           matchedVoter = voter;
@@ -95,9 +97,10 @@ router.post('/verify-face', async (req, res) => {
         console.error(`Error parsing face embedding for voter ${voter.voter_id}:`, e);
       }
     }
+    console.log(`[Face Match] Best match: ${matchedVoter ? matchedVoter.name : 'None'} (distance: ${minDistance.toFixed(4)}, threshold: 0.5)`);
 
-    // 4. Check if a match was found (threshold: 0.6)
-    if (!matchedVoter || minDistance >= 0.6) {
+    // 4. Check if a match was found (threshold: 0.5)
+    if (!matchedVoter || minDistance >= 0.5) {
       return res.status(401).json({ error: 'Face not recognized. Please stand clearly in front of the camera.' });
     }
 
@@ -210,11 +213,13 @@ router.post('/verify-face-pi', async (req, res) => {
     // 4. Compare captured embedding with each registered embedding to find best match
     let matchedVoter = null;
     let minDistance = Infinity;
+    console.log(`[Pi Face Match] Comparing Pi captured face against ${voters.length} registered voters:`);
 
     for (const voter of voters) {
       try {
         const storedEmbedding = JSON.parse(voter.face_embedding);
         const distance = getEuclideanDistance(capturedEmbedding, storedEmbedding);
+        console.log(`  - Comparing with ${voter.name} (${voter.voter_id}): distance = ${distance.toFixed(4)}`);
         if (distance < minDistance) {
           minDistance = distance;
           matchedVoter = voter;
@@ -223,9 +228,10 @@ router.post('/verify-face-pi', async (req, res) => {
         console.error(`Error parsing face embedding for voter ${voter.voter_id}:`, e);
       }
     }
+    console.log(`[Pi Face Match] Best match: ${matchedVoter ? matchedVoter.name : 'None'} (distance: ${minDistance.toFixed(4)}, threshold: 0.5)`);
 
-    // 5. Check if a match was found (threshold: 0.6)
-    if (!matchedVoter || minDistance >= 0.6) {
+    // 5. Check if a match was found (threshold: 0.5)
+    if (!matchedVoter || minDistance >= 0.5) {
       return res.status(401).json({ error: 'Face not recognized. Please stand clearly in front of the camera.' });
     }
 

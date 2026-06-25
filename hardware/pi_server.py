@@ -153,13 +153,13 @@ class TerminalDisplay:
         if HAS_OLED:
             try:
                 with canvas(oled_device) as draw:
-                    # Draw a bounding box for aesthetics
-                    draw.rectangle(oled_device.bounding_box, outline="white", fill="black")
-                    # Draw the text lines
-                    draw.text((8, 4), line1, font=self.font, fill="white")
-                    draw.text((8, 18), line2, font=self.font, fill="white")
-                    draw.text((8, 32), line3, font=self.font, fill="white")
-                    draw.text((8, 46), line4, font=self.font, fill="white")
+                    # Clear screen (no white outline box)
+                    draw.rectangle(oled_device.bounding_box, fill="black")
+                    # Draw the text lines with reduced horizontal offset to prevent clipping
+                    draw.text((2, 4), line1, font=self.font, fill="white")
+                    draw.text((2, 18), line2, font=self.font, fill="white")
+                    draw.text((2, 32), line3, font=self.font, fill="white")
+                    draw.text((2, 46), line4, font=self.font, fill="white")
             except Exception as oled_err:
                 print(f"[OLED Error] Failed to update physical OLED display: {oled_err}")
 
@@ -321,8 +321,8 @@ def run_voting_flow(token, voter_id, name, constituency, backend_url):
     # Show verification success on the OLED screen immediately
     try:
         display.show(
-            "VERIFICATION SUCCESS",
-            f"Voter: {name[:20]}",
+            "VERIFIED!",
+            f"Voter: {name[:14]}",
             "Loading ballot...",
             "Please wait..."
         )
@@ -360,10 +360,10 @@ def run_voting_flow(token, voter_id, name, constituency, backend_url):
         # 1. Voter Ready Confirmation
         print("[Pi Flow] Showing Voter Ready Confirmation screen on OLED/Terminal")
         display.show(
-            f"Voter: {name[:20]}",
-            f"Area: {constituency[:20]}",
-            "Press YES (Btn7) to",
-            "confirm & view ballot"
+            f"Voter: {name[:14]}",
+            f"Area: {constituency[:15]}",
+            "Press YES (Btn7)",
+            "to view ballot"
         )
         
         ready_confirmed = False
@@ -389,54 +389,100 @@ def run_voting_flow(token, voter_id, name, constituency, backend_url):
             time.sleep(2)
             return
 
-        # 2. Candidate Selection Loop
+        # 2. Candidate Selection & Confirmation Loop
         print("[Pi Flow] Entering Candidate Selection Loop")
         while True:
             selected_candidate = None
             selected_idx = None
+            pressed_btn = None
             
-            while True:
-                line1 = f"1: {candidates[0]['name'][:10]} | 2: {candidates[1]['name'][:10]}" if len(candidates) > 1 else f"1: {candidates[0]['name'][:10]}" if len(candidates) > 0 else ""
-                line2 = f"3: {candidates[2]['name'][:10]} | 4: {candidates[3]['name'][:10]}" if len(candidates) > 3 else f"3: {candidates[2]['name'][:10]}" if len(candidates) > 2 else ""
-                line3 = f"5: {candidates[4]['name'][:10]} | 6: NOTA" if len(candidates) > 4 else "6: NOTA"
-                # line4 = "Btn 1-5: Cand | Btn 6: NOTA"
-                
+            # Slide through each candidate, spending 4 seconds on each.
+            # Voter can press a candidate button (1-6) at any time to skip.
+            for idx, cand in enumerate(candidates):
+                display.show(
+                    f"Candidate {idx + 1}:",
+                    f"Name: {cand['name'][:14]}",
+                    f"Party: {cand['party'][:14]}",
+                    f"Sym: {cand['symbol'][:14]}"
+                )
                 print_console_ballot(candidates, constituency)
-                display.show(line1, line2, line3)
                 
-                press = None
+                # Wait for 4 seconds, polling for button press every 0.1s
+                start_slide_time = time.time()
+                while time.time() - start_slide_time < 4.0:
+                    press = get_button_press()
+                    if press is not None:
+                        pressed_btn = press
+                        break
+                    time.sleep(0.1)
+                
+                if pressed_btn is not None:
+                    break
+            
+            # If no button pressed during the individual slides, show NOTA slide for 4s
+            if pressed_btn is None:
+                display.show(
+                    "Candidate 6:",
+                    "NOTA",
+                    "None of the Above",
+                    ""
+                )
+                start_slide_time = time.time()
+                while time.time() - start_slide_time < 4.0:
+                    press = get_button_press()
+                    if press is not None:
+                        pressed_btn = press
+                        break
+                    time.sleep(0.1)
+
+            # If no button was pressed during the slideshow, show standby selection screen
+            if pressed_btn is None:
+                display.show(
+                    "MAKE YOUR CHOICE",
+                    "Buttons 1-5: Cands",
+                    "Button 6: NOTA",
+                    "Press Btn 1-6"
+                )
+                
+                # Wait indefinitely (up to 60s timeout) for their button press
                 timeout = time.time() + 60
                 while time.time() < timeout:
                     press = get_button_press()
                     if press is not None:
-                        print(f"[Pi Flow] Key/Button pressed during candidate selection: {press}")
+                        pressed_btn = press
                         break
                     time.sleep(0.1)
-                    
-                if press is None:
-                    print("[Pi Flow] Candidate selection timed out")
-                    display.show("SESSION TIMEOUT", "Returning to start...", "", "")
-                    time.sleep(2)
-                    return
-                    
-                if press >= 1 and press <= 5:
-                    cand_idx = press - 1
-                    if cand_idx < len(candidates):
-                        selected_candidate = candidates[cand_idx]
-                        selected_idx = cand_idx + 1
-                        print(f"[Pi Flow] Selected candidate {selected_idx}: {selected_candidate['name']}")
-                        break
-                elif press == 6:
-                    selected_candidate = {"name": "NOTA", "party": "None of the Above"}
-                    selected_idx = 6
-                    print("[Pi Flow] Selected NOTA (Button 6)")
-                    break
+
+            # If they timed out or didn't press anything:
+            if pressed_btn is None:
+                print("[Pi Flow] Candidate selection timed out")
+                display.show("SESSION TIMEOUT", "Returning to start...", "", "")
+                time.sleep(2)
+                return
+
+            # Process the pressed button
+            if pressed_btn >= 1 and pressed_btn <= 5:
+                cand_idx = pressed_btn - 1
+                if cand_idx < len(candidates):
+                    selected_candidate = candidates[cand_idx]
+                    selected_idx = pressed_btn
+                    print(f"[Pi Flow] Selected candidate {selected_idx}: {selected_candidate['name']}")
+            elif pressed_btn == 6:
+                selected_candidate = {"name": "NOTA", "party": "None of the Above"}
+                selected_idx = 6
+                print("[Pi Flow] Selected NOTA (Button 6)")
+            else:
+                # Ignore other buttons and let loop continue
+                continue
+
+            if selected_candidate is None:
+                continue
 
             # 3. Confirm Choice
             print(f"[Pi Flow] Confirming choice: {selected_candidate['name']}")
             display.show(
-                f"Vote for: {selected_candidate['name'][:18]}",
-                f"Party: {selected_candidate['party'][:20]}",
+                f"Vote: {selected_candidate['name'][:13]}",
+                f"Party: {selected_candidate['party'][:13]}",
                 "Confirm? YES (Btn7)",
                 "Cancel? NO (Btn8)"
             )
@@ -455,7 +501,7 @@ def run_voting_flow(token, voter_id, name, constituency, backend_url):
                 break  # Confirmed! Proceed to send.
             elif confirm_press == 8:
                 print("[Pi Flow] Vote cancelled (NO / Btn 8 / Key 'n'), restarting selection")
-                continue  # Re-run selection loop.
+                continue  # Restart outer selection loop.
             else:
                 print("[Pi Flow] Vote confirmation timed out")
                 display.show("SESSION TIMEOUT", "Returning to start...", "", "")
@@ -465,9 +511,9 @@ def run_voting_flow(token, voter_id, name, constituency, backend_url):
         # 4. Send Choice to Laptop Backend (Send Data Function)
         print(f"[Pi Flow] Sending cast vote request to backend at {backend_url}/api/vote/cast-pi")
         display.show(
-            "[VOTE] SENDING CHOICE...",
-            "Securing transaction",
-            "Recording in ledger",
+            "SENDING VOTE...",
+            "Securing...",
+            "Recording ledger",
             "Please wait..."
         )
         
@@ -488,9 +534,9 @@ def run_voting_flow(token, voter_id, name, constituency, backend_url):
                 tx_id = res_data.get("transactionID", "UNKNOWN")
                 print(f"[Pi Flow] SUCCESS: Vote recorded. Transaction ID: {tx_id}")
                 display.show(
-                    "[OK] VOTE RECORDED!",
-                    "Success! Thank you.",
-                    f"Tx: {tx_id[:16]}...",
+                    "VOTE RECORDED!",
+                    "Thank you.",
+                    f"Tx: {tx_id[:16]}",
                     "Clearing session..."
                 )
                 time.sleep(4)
@@ -498,8 +544,8 @@ def run_voting_flow(token, voter_id, name, constituency, backend_url):
                 err_msg = res.json().get("error", "Cast failed.")
                 print(f"[Pi Flow] ERROR: Vote cast rejected by server (HTTP {res.status_code}): {err_msg}")
                 display.show(
-                    "[FAIL] SUBMIT FAILED",
-                    err_msg[:30],
+                    "SUBMIT FAILED",
+                    err_msg[:20],
                     "Resetting in 3s...",
                     ""
                 )
@@ -507,8 +553,8 @@ def run_voting_flow(token, voter_id, name, constituency, backend_url):
         except Exception as e:
             print(f"[Pi Flow] Network Cast Error: {e}")
             display.show(
-                "[FAIL] NETWORK ERROR",
-                "Could not reach server",
+                "NETWORK ERROR",
+                "Cannot reach server",
                 "Resetting in 3s...",
                 ""
             )
@@ -533,10 +579,8 @@ def reset_to_idle():
     voting_active = False
     print("[Pi Flow] Resetting terminal to idle screen")
     display.show(
-        "REMOTE VOTING TERMINAL",
-        "Ready for Authentication",
-        "Use Laptop Dashboard",
-        "to initiate Face Scan"
+        "REMOTE VOTING",
+        "TERMINAL"
     )
 
 # ── HTTP Server Request Handler ───────────────────────────────────────────────

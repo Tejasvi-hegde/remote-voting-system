@@ -90,7 +90,7 @@ async function seed() {
   
   for (let i = 1; i <= 50; i++) {
     const vId = `IND${String(i).padStart(7, '0')}`;
-    const name = `${firstNames[i % firstNames.length]} ${lastNames[i % lastNames.length]}`;
+    const name = `${firstNames[(i - 1) % firstNames.length]} ${lastNames[Math.floor((i - 1) / firstNames.length) % lastNames.length]}`;
     const year = 1960 + (i % 40);
     const month = String((i % 12) + 1).padStart(2, '0');
     const day = String((i % 28) + 1).padStart(2, '0');
