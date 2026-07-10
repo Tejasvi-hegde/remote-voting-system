@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './AdminScreen.css';
 
-const API_BASE = 'http://localhost:5001/api/admin';
+const API_BASE = '/api/admin';
 
 export default function AdminScreen() {
   const [voters, setVoters] = useState([]);

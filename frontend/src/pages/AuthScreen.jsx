@@ -15,6 +15,7 @@ function AuthScreen() {
   // Pi Verification State
   const [piVerifying, setPiVerifying] = useState(false);
   const [piSuccessVoter, setPiSuccessVoter] = useState(null);
+  const [piIp, setPiIp] = useState('raspberrypi.local');
 
   const handlePiFaceVerify = async (e) => {
     e.preventDefault();
@@ -22,8 +23,8 @@ function AuthScreen() {
     setPiVerifying(true);
 
     try {
-      const { data } = await axios.post('http://localhost:5001/api/auth/verify-face-pi', {
-        piIp: 'raspberrypi.local'
+      const { data } = await axios.post('/api/auth/verify-face-pi', {
+        piIp: piIp
       });
       if (data.success) {
         setPiSuccessVoter({
@@ -111,8 +112,17 @@ function AuthScreen() {
         </p>
 
         <form onSubmit={handlePiFaceVerify}>
+          <div style={{ marginBottom: '1.5rem', textAlign: 'left' }}>
+            <label style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', fontWeight: 'bold', marginBottom: '0.5rem' }}>Raspberry Pi IP / Hostname</label>
+            <input 
+              type="text" 
+              value={piIp} 
+              onChange={(e) => setPiIp(e.target.value)} 
+              placeholder="e.g. raspberrypi.local or 10.244.249.xx"
+              style={{ width: '100%', padding: '10px', fontSize: '1.05rem', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box' }}
+            />
+          </div>
 
-          
           <button 
             className="btn-primary" 
             type="submit"

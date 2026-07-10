@@ -6,6 +6,9 @@ const { extractFaceEmbedding, getEuclideanDistance } = require('../utils/face');
 const os = require('os');
 
 function getLocalIpAddress() {
+  if (process.env.LOCAL_IP) {
+    return process.env.LOCAL_IP;
+  }
   const interfaces = os.networkInterfaces();
   for (const name of Object.keys(interfaces)) {
     for (const iface of interfaces[name]) {

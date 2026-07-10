@@ -21,7 +21,24 @@ app.locals.blockchain = blockchain;
 
 // ─── Security Middleware ───────────────────────────────────────────────────────
 app.use(helmet());
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000' }));
+
+// Configure CORS to support local network access in development
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:3000';
+      if (origin === allowedOrigin) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    }
+  },
+  credentials: true
+};
+app.use(cors(corsOptions));
 app.use(morgan('dev'));
 app.use(express.json());
 
