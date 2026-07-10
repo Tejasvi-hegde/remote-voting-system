@@ -173,7 +173,7 @@ router.post('/verify-face-pi', async (req, res) => {
     let extractionError = null;
 
     console.log(`[Pi Verify] Extracting face embedding from ${imagesToTry.length} snapshots...`);
-    
+
     for (let i = 0; i < imagesToTry.length; i++) {
       try {
         const result = await extractFaceEmbedding(imagesToTry[i]);
@@ -199,8 +199,8 @@ router.post('/verify-face-pi', async (req, res) => {
         console.error('[Pi Verify] Failed to save diagnostic image:', err.message);
       }
 
-      return res.status(502).json({ 
-        error: `Pi camera verification error: ${extractionError ? extractionError.message : 'No face detected in any of the snapshots. Please make sure the voter stands clearly in front of the camera.'}` 
+      return res.status(502).json({
+        error: `Pi camera verification error: ${extractionError ? extractionError.message : 'No face detected in any of the snapshots. Please make sure the voter stands clearly in front of the camera.'}`
       });
     }
 

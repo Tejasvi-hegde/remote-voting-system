@@ -3,33 +3,15 @@ import sys
 import json
 import base64
 import os
-
-try:
-    import face_recognition
-    import numpy as np
-    from PIL import Image
-    import io
-    HAS_LIBS = True
-except ImportError:
-    HAS_LIBS = False
+import face_recognition
+import numpy as np
+from PIL import Image
+import io
 
 def get_embedding(img_base64):
     # Strip header if present (e.g. data:image/jpeg;base64,)
     if ',' in img_base64:
         img_base64 = img_base64.split(',')[1]
-
-    mock_base64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-    if img_base64 == mock_base64 or not HAS_LIBS:
-        # Simulation Mode or Mock Image: Generate a deterministic mock 128-d embedding
-        # based on the hash of the image content to simulate verification.
-        import hashlib
-        h = hashlib.sha256(img_base64.encode('utf-8')).hexdigest()
-        vals = []
-        for i in range(128):
-            char_idx = (i * 2) % len(h)
-            val = int(h[char_idx:char_idx+2], 16) / 255.0 - 0.5
-            vals.append(val)
-        return vals
 
     try:
         img_data = base64.b64decode(img_base64)
@@ -77,4 +59,4 @@ if __name__ == '__main__':
         print(json.dumps(result))
         sys.exit(1)
     else:
-        print(json.dumps({"embedding": result, "is_mock": not HAS_LIBS}))
+        print(json.dumps({"embedding": result, "is_mock": False}))

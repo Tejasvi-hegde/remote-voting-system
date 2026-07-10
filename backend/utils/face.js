@@ -26,12 +26,23 @@ function extractFaceEmbedding(imageBase64) {
       pythonCmd = venvWin;
     } else if (fs.existsSync(venvUnix)) {
       pythonCmd = venvUnix;
+    } else if (process.platform === 'win32') {
+      pythonCmd = 'py';
     }
 
     const pythonProcess = spawn(pythonCmd, [scriptPath]);
 
     let stdoutData = '';
     let stderrData = '';
+
+    pythonProcess.on('error', (err) => {
+      console.error('[Face Process Startup Error]', err);
+      reject(new Error(`Failed to start face recognition helper (${pythonCmd}): ${err.message}`));
+    });
+
+    pythonProcess.stdin.on('error', (err) => {
+      console.error('[Face Process Stdin Error]', err);
+    });
 
     pythonProcess.stdout.on('data', (data) => {
       stdoutData += data.toString();
@@ -63,8 +74,13 @@ function extractFaceEmbedding(imageBase64) {
     });
 
     // Write base64 image data to stdin of Python process
-    pythonProcess.stdin.write(imageBase64);
-    pythonProcess.stdin.end();
+    try {
+      pythonProcess.stdin.write(imageBase64);
+      pythonProcess.stdin.end();
+    } catch (writeErr) {
+      console.error('[Face Process Stdin Write Exception]', writeErr);
+      reject(new Error(`Failed to pipe face image to python helper: ${writeErr.message}`));
+    }
   });
 }
 

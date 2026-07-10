@@ -16,6 +16,9 @@ const adminRoutes = require('./routes/admin');
 
 const app = express();
 
+// Trust proxy for rate limiting (needed behind reverse proxies, local tunneling, etc.)
+app.set('trust proxy', 1);
+
 app.locals.db = db;
 app.locals.blockchain = blockchain;
 

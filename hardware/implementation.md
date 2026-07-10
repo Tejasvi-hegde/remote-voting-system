@@ -131,6 +131,7 @@ The terminal uses a **1.3" I2C OLED Display** (SH1106 or SSD1306) and an **8-But
 | **Button 6 (NOTA / None)**  | K6 | GPIO 25 | Pin 22 |
 | **Button 7 (YES / Confirm)**| K7 | GPIO 5  | Pin 29 |
 | **Button 8 (NO / Cancel)**  | K8 | GPIO 6  | Pin 31 |
+| **Buzzer**                 | +  | GPIO 16 | Pin 36 |
 
 *Note: Buttons use the Pi's internal pull-up configuration (`GPIO.PUD_UP`), meaning button inputs read `LOW` (0) when pressed, and `HIGH` (1) when idle.*
 

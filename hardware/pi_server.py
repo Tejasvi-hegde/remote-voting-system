@@ -59,6 +59,7 @@ PIN_CAND5 = 24     # Button 5
 PIN_NOTA = 25      # Button 6
 PIN_YES = 5        # Button 7
 PIN_NO = 6         # Button 8
+PIN_BUZZER = 16    # Buzzer (Physical Pin 36)
 
 PINS = [PIN_CAND1, PIN_CAND2, PIN_CAND3, PIN_CAND4, PIN_CAND5, PIN_NOTA, PIN_YES, PIN_NO]
 
@@ -66,6 +67,9 @@ PINS = [PIN_CAND1, PIN_CAND2, PIN_CAND3, PIN_CAND4, PIN_CAND5, PIN_NOTA, PIN_YES
 HAS_GPIO = False
 GPIO_LIB = "simulation"
 GPIO_BUTTONS = {}
+buzzer = None
+buzzer_lock = threading.Lock()
+buzzer_active = False
 
 # Try gpiozero first (standard and highly reliable on Raspberry Pi 5)
 try:
@@ -95,6 +99,57 @@ except Exception as e1:
         print("[OK] RPi.GPIO initialized. Physical buttons configured.")
     except Exception as e2:
         print(f"[WARN] GPIO libraries not available/failed (gpiozero: {e1}; RPi.GPIO: {e2}). Running buttons in SIMULATION mode.")
+
+# Initialize Buzzer separately to prevent pin conflicts (e.g. 1-Wire on GPIO 4) from disabling buttons
+if HAS_GPIO:
+    if GPIO_LIB == "gpiozero":
+        try:
+            from gpiozero import Buzzer as GZBuzzer
+            buzzer = GZBuzzer(PIN_BUZZER)
+            print(f"[OK] gpiozero buzzer configured on GPIO {PIN_BUZZER}.")
+        except Exception as bez:
+            print(f"[WARN] Failed to initialize physical buzzer via gpiozero on GPIO {PIN_BUZZER}: {bez}")
+            print(f"[INFO] If this is a pin conflict error, verify if 1-Wire (which uses GPIO 4 by default) is enabled on the Pi and disable it.")
+    elif GPIO_LIB == "RPi.GPIO":
+        try:
+            import RPi.GPIO as GPIO
+            GPIO.setup(PIN_BUZZER, GPIO.OUT)
+            GPIO.output(PIN_BUZZER, GPIO.LOW)
+            print(f"[OK] RPi.GPIO buzzer configured on GPIO {PIN_BUZZER}.")
+        except Exception as bez:
+            print(f"[WARN] Failed to initialize physical buzzer via RPi.GPIO on GPIO {PIN_BUZZER}: {bez}")
+
+# ── Buzzer Thread Helper ──────────────────────────────────────────────────────
+def _beep_worker(duration):
+    global buzzer_active, buzzer
+    with buzzer_lock:
+        if buzzer_active:
+            return
+        buzzer_active = True
+
+    try:
+        print(f"[BUZZER] Beeping on GPIO {PIN_BUZZER} for {duration}s...")
+        if GPIO_LIB == "gpiozero" and buzzer is not None:
+            buzzer.on()
+            time.sleep(duration)
+            buzzer.off()
+        elif GPIO_LIB == "RPi.GPIO":
+            import RPi.GPIO as GPIO
+            GPIO.output(PIN_BUZZER, GPIO.HIGH)
+            time.sleep(duration)
+            GPIO.output(PIN_BUZZER, GPIO.LOW)
+        else:
+            # Simulation mode
+            time.sleep(duration)
+        print("[BUZZER] Beep complete.")
+    except Exception as ex:
+        print(f"[BUZZER Error] Failed to beep: {ex}")
+    finally:
+        with buzzer_lock:
+            buzzer_active = False
+
+def trigger_buzzer(duration=2.0):
+    threading.Thread(target=_beep_worker, args=(duration,), daemon=True).start()
 
 # Detect physical OLED display (SH1106 / SSD1306)
 HAS_OLED = False
@@ -318,6 +373,9 @@ def run_voting_flow(token, voter_id, name, constituency, backend_url):
     voting_active = True
     print(f"\n[Pi Flow] Starting voting flow for voter: {name} (ID: {voter_id}), constituency: '{constituency}'")
     
+    # Trigger buzzer for 2 seconds after successful face scan
+    trigger_buzzer(2.0)
+    
     # Show verification success on the OLED screen immediately
     try:
         display.show(
@@ -375,6 +433,7 @@ def run_voting_flow(token, voter_id, name, constituency, backend_url):
             if press == 7:
                 ready_confirmed = True
                 print("[Pi Flow] Voter pressed YES/Confirm (Btn 7 / Key 'y')")
+                trigger_buzzer(2.0)
                 break
             elif press == 8:
                 print("[Pi Flow] Voter pressed NO/Cancel (Btn 8 / Key 'n')")
@@ -498,6 +557,7 @@ def run_voting_flow(token, voter_id, name, constituency, backend_url):
                 
             if confirm_press == 7:
                 print("[Pi Flow] Vote confirmed (YES / Btn 7 / Key 'y')")
+                trigger_buzzer(2.0)
                 break  # Confirmed! Proceed to send.
             elif confirm_press == 8:
                 print("[Pi Flow] Vote cancelled (NO / Btn 8 / Key 'n'), restarting selection")
